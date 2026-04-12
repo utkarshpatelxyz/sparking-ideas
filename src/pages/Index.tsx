@@ -10,7 +10,7 @@ function MeridianApp() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-surface px-6 py-5">
+      <header className="border-b border-border bg-surface px-6 py-6">
         <div className="flex items-center justify-between max-w-[1600px] mx-auto">
           <div className="flex items-center gap-3">
             
@@ -19,7 +19,7 @@ function MeridianApp() {
               <img 
                 src="/MERIDIAN_LOGO.png" 
                 alt="MERIDIAN" 
-                className="h-20 w-auto"
+                className="h-28 w-auto"
               />
               <div>
                 <div className="h-0.5 w-full bg-primary/50 rounded-full mt-0.5" />

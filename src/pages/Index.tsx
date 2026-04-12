@@ -13,14 +13,24 @@ function MeridianApp() {
       <header className="border-b border-border bg-surface px-6 py-4">
         <div className="flex items-center justify-between max-w-[1600px] mx-auto">
           <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                <span className="text-primary glow-text">MERIDIAN</span>
-              </h1>
-              <div className="h-0.5 w-full bg-primary/50 rounded-full mt-0.5" />
+            
+            {/* LOGO REPLACED HERE */}
+            <div className="flex items-center gap-3">
+              <img 
+                src="/MERIDIAN_LOGO.png" 
+                alt="MERIDIAN" 
+                className="h-8 w-auto"
+              />
+              <div>
+                <div className="h-0.5 w-full bg-primary/50 rounded-full mt-0.5" />
+              </div>
             </div>
-            <span className="text-sm text-muted-foreground hidden sm:inline">Static Equipment Review Tool</span>
+
+            <span className="text-sm text-muted-foreground hidden sm:inline">
+              Static Equipment Review Tool
+            </span>
           </div>
+
           {state.equipmentType && (
             <button
               onClick={() => dispatch({ type: 'RESET' })}

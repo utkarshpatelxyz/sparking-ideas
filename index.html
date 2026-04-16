@@ -292,7 +292,7 @@
                 const containerRect = dockContainer.getBoundingClientRect();
                 const dockFinalHeight = containerRect.height * finalScale;
                 const gap = 18;
-                const translateY = (window.innerHeight - containerRect.bottom - gap + (containerRect.height - dockFinalHeight) / 2) * 0.55;
+                const translateY = (window.innerHeight - containerRect.bottom - gap + (containerRect.height - dockFinalHeight) / 2) * 0.85;
 
                 const dockAnim = dockContainer.animate([
                     { transform: `translateY(0px) scale(1)`,                         opacity: 1 },

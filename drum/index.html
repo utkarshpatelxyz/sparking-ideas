@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERIDIAN | Static Equipment Engineering Review System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #F8FAFC;
+            --secondary-bg: #FFFFFF;
+            --panel-bg: #F1F5F9;
+            --header-bg: #1E3A5F;
+            --accent-primary: #0F4C81;
+            --accent-secondary: #1A6DB5;
+            --accent-bright: #2196F3;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --border: #CBD5E1;
+            --success: #16A34A;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --info: #0284C7;
+            
+            --lvl-1: #DC2626; --lvl-1-bg: #FEE2E2;
+            --lvl-2: #EA580C; --lvl-2-bg: #FFEDD5;
+            --lvl-3: #D97706; --lvl-3-bg: #FEF3C7;
+            --lvl-4: #2563EB; --lvl-4-bg: #DBEAFE;
+            --lvl-5: #16A34A; --lvl-5-bg: #DCFCE7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary-bg); color: var(--text-primary); overflow-x: hidden; }
+
+        /* Header */
+        header {
+            background: var(--header-bg);
+            color: white;
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-bright);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-weight: 800; font-size: 1.4rem; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 24px; height: 24px; background: var(--accent-bright); clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+
+        /* Layout Zones */
+        .main-layout { display: flex; height: calc(100vh - 55px); width: 100vw; }
+        
+        /* Zone 1: Infographic (Left) */
+        #zone-1 { width: 30%; background: white; border-right: 1px solid var(--border); padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Zone 2: Requirements (Middle) */
+        #zone-2 { width: 45%; padding: 2rem; overflow-y: auto; background: var(--primary-bg); }
+        
+        /* Zone 3: Dashboard (Right) */
+        #zone-3 { width: 25%; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 1.5rem; overflow-y: auto; }
+
+        /* Typography & Headings */
+        h1, h2, h3 { font-family: 'Roboto Condensed', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-header { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--accent-primary); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+        
+        /* Selection Cards */
+        .selection-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2rem; }
+        .card-choice {
+            background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem;
+            cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 15px;
+        }
+        .card-choice:hover { border-color: var(--accent-bright); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card-choice.active { border: 2px solid var(--accent-bright); background: #F0F9FF; }
+        .card-choice.disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Verification Cards */
+        .requirement-card {
+            background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;
+            padding: 1.25rem; position: relative; transition: shadow 0.2s;
+        }
+        .req-id { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); }
+        .req-weight-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.5rem; display: inline-block; }
+        .req-text { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.75rem; color: var(--text-primary); }
+        .req-meta { display: flex; gap: 15px; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; }
+        .req-notes { font-size: 0.8rem; color: var(--text-muted); font-style: italic; background: #F8FAFC; padding: 8px; border-radius: 4px; margin-bottom: 1rem; border-left: 2px solid var(--border); }
+        .code-ref { font-family: 'JetBrains Mono', monospace; color: var(--accent-primary); font-weight: 600; }
+        
+        .status-btn-group { display: flex; gap: 5px; }
+        .status-btn { 
+            flex: 1; padding: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid var(--border); 
+            border-radius: 4px; background: white; cursor: pointer; transition: all 0.1s;
+        }
+        .status-btn.active.reviewed { background: var(--success); color: white; border-color: var(--success); }
+        .status-btn.active.open { background: var(--warning); color: white; border-color: var(--warning); }
+        .status-btn.active.na { background: var(--text-muted); color: white; border-color: var(--text-muted); }
+
+        /* Dashboard UI */
+        .dash-section { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .dash-title { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.75rem; }
+        .progress-item { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
+        
+        /* Complexity Gauge */
+        .gauge-wrap { text-align: center; padding: 1rem 0; }
+        .complexity-badge { padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 0.75rem; display: inline-block; margin-top: 0.5rem; }
+
+        /* Navigation */
+        .nav-footer { position: sticky; bottom: 0; background: white; border-top: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; }
+        .breadcrumb { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; display: flex; gap: 8px; align-items: center; }
+        .breadcrumb span.active { color: var(--accent-bright); font-weight: 700; }
+
+        /* SVG Styles */
+        .eng-line { stroke: #0F4C81; stroke-width: 1.5; fill: none; }
+        .eng-line-thin { stroke: #1A6DB5; stroke-width: 1; fill: none; }
+        .eng-fill { fill: #EFF6FF; stroke: #0F4C81; stroke-width: 1.2; }
+        .eng-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #0F172A; }
+        .eng-arrow { fill: #DC2626; stroke: #DC2626; stroke-width: 1; }
+
+        /* Hidden Utility */
+        .hidden { display: none !important; }
+        .btn { padding: 10px 20px; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; transition: background 0.2s; }
+        .btn-primary { background: var(--accent-bright); color: white; }
+        .btn-primary:hover { background: var(--accent-secondary); }
+        .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+
+        @media (max-width: 1000px) {
+            .main-layout { flex-direction: column; overflow-y: auto; height: auto; }
+            #zone-1, #zone-2, #zone-3 { width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="logo-icon"></div>
+        MERIDIAN
+    </div>
+    <div style="font-size: 0.8rem; font-weight: 500; opacity: 0.8;">Engineering Review Intelligence v2.0</div>
+</header>
+
+<div class="main-layout" id="app-container">
+    <!-- Zone 1: Infographic -->
+    <section id="zone-1">
+        <div id="infographic-content" style="width: 100%;"></div>
+    </section>
+
+    <!-- Zone 2: Requirements -->
+    <section id="zone-2">
+        <div id="breadcrumb-container" class="breadcrumb"></div>
+        <div id="step-content"></div>
+        <div id="checklist-container"></div>
+    </section>
+
+    <!-- Zone 3: Dashboard -->
+    <section id="zone-3">
+        <div class="dash-section">
+            <h3 class="dash-title">COMPLEXITY LEVEL</h3>
+            <div class="gauge-wrap">
+                <svg viewBox="0 0 100 55" width="120">
+                    <path d="M 20 50 A 30 30 0 0 1 80 50" fill="none" stroke="#CBD5E1" stroke-width="8" stroke-linecap="round"/>
+                    <path id="gauge-arc" d="M 20 50 A 30 30 0 0 1 80 50" fill="none" stroke="var(--success)" stroke-width="8" stroke-linecap="round" stroke-dasharray="95" stroke-dashoffset="95"/>
+                </svg>
+                <div id="complexity-score-val" style="font-size: 1.5rem; font-weight: 800; margin-top: -15px;">0</div>
+                <div id="complexity-badge" class="complexity-badge" style="background: var(--lvl-5-bg); color: var(--lvl-5);">LEVEL 5 — ROUTINE</div>
+            </div>
+            <div id="active-flags-list" style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;"></div>
+        </div>
+
+        <div class="dash-section">
+            <h3 class="dash-title">REVIEW PROGRESS</h3>
+            <div id="section-progress"></div>
+            <div style="margin-top: 15px; font-size: 0.85rem; font-weight: 700; border-top: 1px solid var(--border); padding-top: 10px;">
+                Total: <span id="items-reviewed-count">0</span> / <span id="items-total-count">0</span>
+            </div>
+            <div id="open-points-count" style="color: var(--danger); font-size: 0.75rem; font-weight: 700; margin-top: 5px;"></div>
+        </div>
+
+        <div class="dash-section" style="border-bottom: none;">
+            <button class="btn btn-ghost" style="width: 100%; margin-bottom: 8px;" onclick="exportCSV()">📄 EXPORT CSV</button>
+            <button class="btn btn-ghost" style="width: 100%;" onclick="resetApp()">🔄 RESET</button>
+        </div>
+    </section>
+</div>
+
+<div class="nav-footer">
+    <button class="btn btn-ghost" id="prev-btn" onclick="prevStep()">Back</button>
+    <button class="btn btn-primary" id="next-btn" onclick="nextStep()">Continue</button>
+</div>
+
+<script>
+/**
+ * MERIDIAN DATA - Verification Items Database (S1-S12)
+ */
+const VERIFICATION_ITEMS = [
+    { id: "1.1", section: "S1", sub: "ID", trigger: "DESIGN", text: "Verify equipment TAG on drawing matches EXACTLY with LESA and MDS", ref: "GTTT 6.1.3", wt: 3, disc: "133-STA", notes: "Stop review if discrepancy found." },
+    { id: "1.5", section: "S1", sub: "Code", trigger: "DESIGN", text: "Verify construction code matches contract edition (ASME VIII Div.1/2)", ref: "UG-116", wt: 3, disc: "133-STA" },
+    { id: "2.1", section: "S2", sub: "Data", trigger: "DESIGN", text: "Verify internal design pressure matches MDS (Pressure at TOP)", ref: "UG-21", wt: 5, disc: "133-STA" },
+    { id: "2.3", section: "S2", sub: "Data", trigger: "DESIGN", text: "Verify MDMT matches MDS; must be most restrictive of all components", ref: "UCS-66", wt: 5, disc: "133-STA" },
+    { id: "2A.1", section: "S2A", sub: "Lethal", trigger: "LETHAL", text: "Verify 100% Radiography (Full RT) - Mandatory for Lethal Service", ref: "UW-2(a)", wt: 5, disc: "133-STA" },
+    { id: "2A.4", section: "S2A", sub: "Vac", trigger: "FV", text: "Verify external pressure design and dimensioning of stiffening rings", ref: "UG-28", wt: 5, disc: "133-STA" },
+    { id: "2A.7", section: "S2A", sub: "Sour", trigger: "WET_H2S", text: "Verify bolting is SA-193 Gr. B7M / SA-194 Gr. 2HM", ref: "NACE MR0175", wt: 5, disc: "133-STA" },
+    { id: "3.1", section: "S3", sub: "Shell", trigger: "DESIGN", text: "Verify shell inside diameter (ID) against LESA", ref: "UG-27", wt: 5, disc: "133-STA" },
+    { id: "3.6", section: "S3", sub: "Heads", trigger: "DESIGN", text: "Verify min head thickness AFTER forming (UG-32)", ref: "UG-32", wt: 5, disc: "133-STA" },
+    { id: "4.2", section: "S4", sub: "Skirt", trigger: "SKIRT", text: "Verify skirt height (base plane to bottom TL) matches LESA", ref: "ITG-133", wt: 5, disc: "131-PIP", notes: "Coordinate with Piping." },
+    { id: "4.6", section: "S4", sub: "Skirt", trigger: "SKIRT", text: "Verify BCD (Bolt Circle Diameter) and anchor bolt holes match MDS", ref: "VEFV1107M", wt: 5, disc: "132-CIV" },
+    { id: "5.1", section: "S5", sub: "Noz", trigger: "NOZZLES", text: "Verify ALL nozzles from LESA appear on vendor drawing", ref: "GTTT 6.1.3", wt: 5, disc: "133-STA" },
+    { id: "5.3", section: "S5", sub: "Noz", trigger: "NOZZLES", text: "Verify flange rating and facing matches MDS", ref: "B16.5", wt: 5, disc: "133-STA" },
+    { id: "7A.1", section: "S7A", sub: "Col", trigger: "COLUMN_INT", text: "Verify all internals fit through the manway (Disassembly check)", ref: "VECV1001", wt: 5, disc: "133-STA" },
+    { id: "7A.8", section: "S7A", sub: "Mist", trigger: "DEMISTER", text: "Verify mist eliminator elevation and sections fit through manway", ref: "VECV1001", wt: 5, disc: "133-STA" },
+    { id: "7B.3", section: "S7B", sub: "React", trigger: "CATALYST", text: "Verify catalyst support grid type, material, and load capacity", ref: "MDS", wt: 5, disc: "133-STA" },
+    { id: "7B.6", section: "S7B", sub: "React", trigger: "QUENCH", text: "Verify inter-bed quench mixer system and nozzle elevation", ref: "MDS", wt: 5, disc: "120-PR" },
+    { id: "8.1", section: "S8", sub: "Weld", trigger: "COURSES", text: "Verify circumferential shell welds do not coincide with nozzles", ref: "UW-14", wt: 5, disc: "133-STA" },
+    { id: "9.1", section: "S9", sub: "Mat", trigger: "MATERIALS", text: "Verify material grades (e.g. SA-516 Gr. 70N) match MDS exactly", ref: "MDS", wt: 5, disc: "133-STA" },
+    { id: "10.5", section: "S10", sub: "Loads", trigger: "WEIGHTS", text: "Verify Wind/Seismic Bending & Shear loads match Civil data", ref: "VECV1001", wt: 5, disc: "132-CIV" },
+    { id: "T.1", section: "TANK", sub: "Code", trigger: "TANK_GENERAL", text: "Verify API 650 edition and Annex E/V applicability", ref: "API 650", wt: 5, disc: "133-STA" },
+    { id: "T.4", section: "TANK", sub: "Shell", trigger: "TANK_GENERAL", text: "Verify shell thicknesses (1-foot method) and plate stacking", ref: "API 650 §5.6", wt: 5, disc: "133-STA" }
+];
+
+/**
+ * STATE MANAGEMENT
+ */
+let state = {
+    step: 0,
+    path: [], // list of step objects
+    selections: {},
+    flags: [],
+    checklistStatus: {}, // { itemId: 'reviewed' | 'open' | 'na' }
+    complexityScore: 0,
+    equipmentType: null
+};
+
+/**
+ * INFOGRAPHICS (SVG DRAWINGS)
+ */
+const SVGLib = {
+    vessel: `<svg viewBox="0 0 200 300" class="eng-svg"><path class="eng-fill" d="M 50 40 A 50 20 0 0 1 150 40 L 150 220 A 50 20 0 0 1 50 220 Z"/><path class="eng-line" d="M 50 40 A 50 15 0 0 1 150 40 M 50 220 A 50 15 0 0 0 150 220"/><line class="eng-line-thin" x1="150" y1="100" x2="170" y2="100"/><text x="175" y="105" class="eng-text">UG-27</text></svg>`,
+    skirt: `<svg viewBox="0 0 200 200" class="eng-svg"><path class="eng-fill" d="M 50 20 A 50 20 0 0 0 150 20 L 150 150 L 160 150 L 160 160 L 40 160 L 40 150 L 50 150 Z"/><circle cx="70" cy="155" r="3" fill="#DC2626"/><circle cx="130" cy="155" r="3" fill="#DC2626"/><text x="100" y="180" class="eng-text" text-anchor="middle">BCD / Anchor Bolts</text></svg>`,
+    nozzle: `<svg viewBox="0 0 200 150" class="eng-svg"><rect x="40" y="60" width="120" height="15" class="eng-fill"/><rect x="85" y="20" width="30" height="40" class="eng-fill"/><path class="eng-line" d="M 80 40 L 120 40"/><text x="125" y="45" class="eng-text">UW-16</text></svg>`,
+    tank: `<svg viewBox="0 0 200 200" class="eng-svg"><rect x="40" y="40" width="120" height="120" class="eng-fill"/><path d="M 40 40 L 100 20 L 160 40" class="eng-line"/><text x="100" y="180" class="eng-text" text-anchor="middle">API 650</text></svg>`
+};
+
+/**
+ * PATH DEFINITIONS
+ */
+const STEPS = {
+    START: {
+        title: "Select Equipment Type",
+        infographic: 'vessel',
+        options: [
+            { id: 'DRUM', label: 'Pressure Vessel / Drum', desc: 'ASME VIII Div 1/2' },
+            { id: 'COLUMN', label: 'Process Column', desc: 'Trays & Packing' },
+            { id: 'REACTOR', label: 'Reactor', desc: 'Catalyst / Refractory' },
+            { id: 'TANK', label: 'Storage Tank', desc: 'API 650 / 620' },
+            { id: 'SPHERE', label: 'Sphere', desc: 'Coming Soon', disabled: true }
+        ]
+    },
+    DRUM_TYPE: {
+        title: "Select Configuration",
+        options: [{ id: 'VERTICAL', label: 'Vertical' }, { id: 'HORIZONTAL', label: 'Horizontal' }]
+    },
+    FLAGS: {
+        title: "Service Flags & Design Conditions",
+        infographic: 'vessel',
+        isMulti: true,
+        triggers: ['DESIGN'],
+        options: [
+            { id: 'LETHAL', label: 'Lethal Service', pts: 3 },
+            { id: 'WET_H2S', label: 'Wet H2S (Sour)', pts: 2 },
+            { id: 'H2_SERVICE', label: 'Hydrogen Service', pts: 2 },
+            { id: 'FV', label: 'Full Vacuum (FV)', pts: 2 },
+            { id: 'LTCS', label: 'Low Temp (<-10°C)', pts: 2 }
+        ]
+    },
+    SUPPORT: {
+        title: "Support Type",
+        infographic: 'skirt',
+        options: [{ id: 'SKIRT', label: 'Skirt Support' }, { id: 'LUGS', label: 'Lugs / Legs' }]
+    },
+    NOZZLES: {
+        title: "Nozzles & Openings",
+        infographic: 'nozzle',
+        triggers: ['NOZZLES']
+    },
+    TANK_SUB: {
+        title: "Tank Selection",
+        infographic: 'tank',
+        triggers: ['TANK_GENERAL'],
+        options: [
+            { id: 'T_FR', label: 'API 650 Fixed Roof' },
+            { id: 'T_IFR', label: 'API 650 Internal Floating' },
+            { id: 'T_CRY', label: 'API 625 Cryogenic' }
+        ]
+    }
+};
+
+/**
+ * ENGINE LOGIC
+ */
+function init() {
+    state.path = [STEPS.START];
+    render();
+}
+
+function render() {
+    const currentStep = state.path[state.step];
+    
+    // Breadcrumb
+    const bc = document.getElementById('breadcrumb-container');
+    bc.innerHTML = state.path.slice(0, state.step + 1).map((s, i) => 
+        `<span class="${i === state.step ? 'active' : ''}">${s.title}</span>`
+    ).join(' > ');
+
+    // Zone 1
+    document.getElementById('infographic-content').innerHTML = SVGLib[currentStep.infographic || 'vessel'];
+
+    // Zone 2 - Options
+    const stepContent = document.getElementById('step-content');
+    stepContent.innerHTML = `<h2 class="section-header">${currentStep.title}</h2>`;
+    
+    if (currentStep.options) {
+        let html = `<div class="selection-grid">`;
+        currentStep.options.forEach(opt => {
+            const active = state.selections[state.step] === opt.id || state.flags.includes(opt.id) ? 'active' : '';
+            html += `
+                <div class="card-choice ${active} ${opt.disabled ? 'disabled' : ''}" onclick="handleSelection('${opt.id}', ${currentStep.isMulti || false})">
+                    <div style="flex:1">
+                        <div style="font-weight:700">${opt.label}</div>
+                        <div style="font-size:0.75rem; color:var(--text-secondary)">${opt.desc || ''}</div>
+                    </div>
+                    ${opt.pts ? `<span class="complexity-badge" style="background:var(--lvl-2-bg); color:var(--lvl-2)">+${opt.pts}</span>` : ''}
+                </div>`;
+        });
+        html += `</div>`;
+        stepContent.innerHTML += html;
+    }
+
+    // Zone 2 - Checklist
+    renderChecklist();
+    
+    // Zone 3 - Dashboard
+    updateDashboard();
+
+    // Nav buttons
+    document.getElementById('prev-btn').disabled = state.step === 0;
+}
+
+function handleSelection(id, isMulti) {
+    if (isMulti) {
+        if (state.flags.includes(id)) {
+            state.flags = state.flags.filter(f => f !== id);
+        } else {
+            state.flags.push(id);
+        }
+    } else {
+        state.selections[state.step] = id;
+        
+        // Logical Routing
+        if (state.step === 0) {
+            state.equipmentType = id;
+            if (id === 'DRUM') state.path = [STEPS.START, STEPS.DRUM_TYPE, STEPS.FLAGS, STEPS.SUPPORT, STEPS.NOZZLES];
+            if (id === 'TANK') state.path = [STEPS.START, STEPS.TANK_SUB, STEPS.NOZZLES];
+        }
+    }
+    render();
+}
+
+function renderChecklist() {
+    const container = document.getElementById('checklist-container');
+    const currentStep = state.path[state.step];
+    
+    // Determine which items to show based on step triggers + flags
+    let activeTriggers = [...(currentStep.triggers || []), ...(state.flags || []), state.selections[state.step]];
+    
+    const items = VERIFICATION_ITEMS.filter(item => activeTriggers.includes(item.trigger));
+    
+    if (items.length === 0) {
+        container.innerHTML = "";
+        return;
+    }
+
+    let html = `<h3 style="margin-bottom:1rem; font-size:0.9rem; color:var(--text-secondary)">VERIFICATION REQUIREMENTS</h3>`;
+    items.forEach(item => {
+        const status = state.checklistStatus[item.id] || 'pending';
+        const weightColor = item.wt === 5 ? 'var(--danger)' : (item.wt === 4 ? 'var(--warning)' : 'var(--info)');
+        
+        html += `
+        <div class="requirement-card" style="border-left: 4px solid ${weightColor}">
+            <div class="req-id">ID: ${item.id}</div>
+            <div class="req-weight-badge" style="background:${weightColor}22; color:${weightColor}">WEIGHT ${item.wt} — ${item.wt >= 5 ? 'CRITICAL' : 'HIGH'}</div>
+            <div class="req-text">${item.text}</div>
+            <div class="req-meta">
+                <span>📋 <span class="code-ref">${item.ref}</span></span>
+                <span>🏷️ ${item.disc}</span>
+            </div>
+            ${item.notes ? `<div class="req-notes">💬 ${item.notes}</div>` : ''}
+            <div class="status-btn-group">
+                <button class="status-btn ${status === 'reviewed' ? 'active reviewed' : ''}" onclick="setStatus('${item.id}', 'reviewed')">REVIEWED ✓</button>
+                <button class="status-btn ${status === 'open' ? 'active open' : ''}" onclick="setStatus('${item.id}', 'open')">OPEN POINT ⚠</button>
+                <button class="status-btn ${status === 'na' ? 'active na' : ''}" onclick="setStatus('${item.id}', 'na')">N/A —</button>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function setStatus(itemId, status) {
+    state.checklistStatus[itemId] = status;
+    render();
+}
+
+function updateDashboard() {
+    // Complexity
+    let score = 0;
+    state.flags.forEach(f => {
+        const opt = STEPS.FLAGS.options.find(o => o.id === f);
+        if (opt) score += opt.pts;
+    });
+    
+    const gauge = document.getElementById('gauge-arc');
+    const scoreVal = document.getElementById('complexity-score-val');
+    const badge = document.getElementById('complexity-badge');
+    
+    scoreVal.innerText = score;
+    let lvl = "5 — ROUTINE", color = "var(--lvl-5)", offset = 95;
+    if (score >= 8) { lvl = "1 — CRITICAL"; color = "var(--lvl-1)"; offset = 0; }
+    else if (score >= 5) { lvl = "2 — HIGH"; color = "var(--lvl-2)"; offset = 30; }
+    else if (score >= 3) { lvl = "3 — MEDIUM"; color = "var(--lvl-3)"; offset = 60; }
+    
+    gauge.style.strokeDashoffset = offset;
+    gauge.style.stroke = color;
+    badge.innerText = `LEVEL ${lvl}`;
+    badge.style.background = color + "22";
+    badge.style.color = color;
+
+    // Progress
+    const totalItems = VERIFICATION_ITEMS.filter(item => {
+        // Simple heuristic for total items based on path
+        return state.path.some(s => (s.triggers || []).includes(item.trigger));
+    }).length;
+
+    const reviewed = Object.values(state.checklistStatus).filter(v => v !== 'pending').length;
+    document.getElementById('items-reviewed-count').innerText = reviewed;
+    document.getElementById('items-total-count').innerText = totalItems;
+}
+
+function nextStep() {
+    if (state.step < state.path.length - 1) {
+        state.step++;
+        render();
+    } else {
+        alert("Review Session Complete. Generate report using Export CSV.");
+    }
+}
+
+function prevStep() {
+    if (state.step > 0) {
+        state.step--;
+        render();
+    }
+}
+
+function resetApp() {
+    if(confirm("Reset entire review state?")) location.reload();
+}
+
+function exportCSV() {
+    let csv = "ID,Section,Item,Status,Reference\n";
+    VERIFICATION_ITEMS.forEach(item => {
+        const status = state.checklistStatus[item.id] || "PENDING";
+        csv += `${item.id},${item.section},"${item.text}",${status},"${item.ref}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `MERIDIAN_REPORT_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+}
+
+init();
+</script>
+</body>
+</html>

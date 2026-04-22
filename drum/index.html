@@ -36,7 +36,7 @@
     </script>
 
     <!-- ═══════════════════════════════════════════════════════════
-         MERIDIAN UI OVERLAY — NEW ADDITION (do not modify above)
+         MERIDIAN UI OVERLAY — UPDATED v2 (do not modify above)
     ═══════════════════════════════════════════════════════════════ -->
     <style>
       /* ── Shared block style ─────────────────────────────────── */
@@ -46,7 +46,11 @@
         -webkit-backdrop-filter: blur(18px) saturate(1.4);
         border-radius: 14px;
         border: 1px solid rgba(255, 255, 255, 0.10);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+        box-shadow:
+          0 8px 32px rgba(0,0,0,0.45),
+          0 2px 8px rgba(0,0,0,0.3),
+          0 20px 40px rgba(0,0,0,0.35),
+          0 4px 12px rgba(0,0,0,0.2);
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
         -webkit-font-smoothing: antialiased;
         color: #ffffff;
@@ -85,18 +89,8 @@
         gap: 14px;
       }
 
-      .mrd-field-group {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-      }
-
-      .mrd-label {
-        font-size: 11px;
-        color: rgba(255,255,255,0.55);
-        font-weight: 500;
-        letter-spacing: 0.15px;
-      }
+      .mrd-field-group { display:flex; flex-direction:column; gap:5px; }
+      .mrd-label { font-size:11px; color:rgba(255,255,255,0.55); font-weight:500; letter-spacing:0.15px; }
 
       .mrd-input {
         width: 100%;
@@ -107,17 +101,11 @@
         font-size: 13px;
         padding: 7px 10px;
         outline: none;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+        font-family: inherit;
         transition: border-color 0.2s, background 0.2s;
         box-sizing: border-box;
       }
-      .mrd-input:focus {
-        border-color: rgba(255,255,255,0.38);
-        background: rgba(255,255,255,0.12);
-      }
-      .mrd-input::placeholder {
-        color: rgba(255,255,255,0.28);
-      }
+      .mrd-input:focus { border-color:rgba(255,255,255,0.38); background:rgba(255,255,255,0.12); }
 
       /* ════════════════════════════════════════════════════════
          BLOCK 2 — Icon Grid (~490 × 240 px)
@@ -143,12 +131,10 @@
         flex-direction: column;
         align-items: center;
         cursor: pointer;
-        transition: transform 0.18s ease;
+        transition: transform 0.18s ease, filter 0.18s ease;
         user-select: none;
       }
-      .mrd-icon-cell:hover {
-        transform: translateY(-4px);
-      }
+      .mrd-icon-cell:hover { transform: translateY(-4px); filter: brightness(1.15); }
 
       .mrd-icon-square {
         width: 52px;
@@ -160,35 +146,16 @@
         position: relative;
         overflow: hidden;
         flex-shrink: 0;
+        /* 3D lift shadow per icon */
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.25);
+        transition: box-shadow 0.18s ease, transform 0.18s ease;
       }
-
-      /* Calendar special icon (Nozzles, #3) */
-      .mrd-cal-icon {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-      }
-      .mrd-cal-day {
-        font-size: 7px;
-        font-weight: 600;
-        color: rgba(255,255,255,0.85);
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        line-height: 1;
-        margin-bottom: 1px;
-      }
-      .mrd-cal-num {
-        font-size: 26px;
-        font-weight: 700;
-        color: #ffffff;
-        line-height: 1;
+      .mrd-icon-cell:hover .mrd-icon-square {
+        box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
       }
 
       .mrd-icon-label {
-        font-size: 11px;
+        font-size: 10px;
         color: rgba(255,255,255,0.80);
         text-align: center;
         max-width: 68px;
@@ -200,10 +167,10 @@
       }
 
       /* ════════════════════════════════════════════════════════
-         BLOCK 3 — Exports Panel (~490 × 230 px)
+         BLOCK 3 — Exports Panel
       ════════════════════════════════════════════════════════ */
       #mrd-block3 {
-        width: 724px; /* block1(220) + gap(14) + block2(490) */
+        width: 724px;
         min-height: 230px;
         padding: 0;
         overflow: hidden;
@@ -221,314 +188,940 @@
         gap: 10px;
         flex-shrink: 0;
       }
-
       .mrd-folder-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 7px;
+        width: 32px; height: 32px; border-radius: 7px;
         background: linear-gradient(135deg, #3478F6, #0060E0);
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      }
+      .mrd-header-titles { display:flex; flex-direction:column; gap:2px; flex:1; }
+      .mrd-header-title { font-size:14px; font-weight:600; color:#fff; line-height:1; }
+      .mrd-header-recents { display:flex; align-items:center; gap:5px; font-size:11px; color:#3478F6; line-height:1; }
+      .mrd-recents-dot { width:8px; height:8px; border-radius:50%; background:#3478F6; flex-shrink:0; }
+      .mrd-header-more { font-size:14px; color:rgba(255,255,255,0.40); letter-spacing:2px; cursor:pointer; }
+
+      .mrd-block3-content { flex:1; background:rgba(20,8,2,0.60); display:flex; min-height:150px; position:relative; overflow:hidden; }
+      .mrd-col-left, .mrd-col-right { flex:1; padding:10px 14px; }
+      .mrd-col-divider { width:1px; background:rgba(255,255,255,0.06); flex-shrink:0; }
+
+      /* Export history items */
+      .mrd-export-item {
         display: flex;
         align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        margin-bottom: 8px;
+        font-size: 12px;
+        color: rgba(255,255,255,0.85);
       }
+      .mrd-export-icon { font-size:18px; flex-shrink:0; }
+      .mrd-export-info { flex:1; min-width:0; }
+      .mrd-export-name { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .mrd-export-time { font-size:10px; color:rgba(255,255,255,0.45); margin-top:2px; }
+      .mrd-download-btn {
+        background: rgba(52,120,246,0.85);
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 10px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 600;
+        flex-shrink: 0;
+        transition: background 0.2s;
+      }
+      .mrd-download-btn:hover { background: #3478F6; }
 
-      .mrd-header-titles {
+      .mrd-block3-footer { height:24px; background:rgba(20,8,2,0.60); border-top:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; padding:0 12px; flex-shrink:0; }
+      .mrd-footer-dots { font-size:12px; color:rgba(255,255,255,0.30); letter-spacing:2px; }
+
+      /* ════════════════════════════════════════════════════════
+         OVERLAY + CHECKLIST PANEL
+      ════════════════════════════════════════════════════════ */
+      #mrd-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.78);
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        animation: mrdOverlayIn 0.25s ease;
+      }
+      @keyframes mrdOverlayIn { from{opacity:0} to{opacity:1} }
+      #mrd-overlay.active { display:block; }
+
+      #mrd-checklist-panel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 740px;
+        max-width: 96vw;
+        z-index: 1001;
         display: flex;
         flex-direction: column;
-        gap: 2px;
-        flex: 1;
+        gap: 0;
+        animation: mrdPanelIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
       }
-      .mrd-header-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: #ffffff;
-        line-height: 1;
-      }
-      .mrd-header-recents {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 11px;
-        color: #3478F6;
-        line-height: 1;
-      }
-      .mrd-recents-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #3478F6;
-        flex-shrink: 0;
-      }
-      .mrd-header-more {
-        font-size: 14px;
-        color: rgba(255,255,255,0.40);
-        letter-spacing: 2px;
-        cursor: pointer;
+      @keyframes mrdPanelIn {
+        from { opacity:0; transform:translate(-50%,-50%) scale(0.88); }
+        to   { opacity:1; transform:translate(-50%,-50%) scale(1); }
       }
 
-      .mrd-block3-content {
-        flex: 1;
-        background: rgba(20, 8, 2, 0.60);
+      /* Close button */
+      #mrd-close-btn {
+        position: absolute;
+        top: -44px;
+        right: 0;
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        font-size: 16px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        flex-shrink: 0;
+      }
+      #mrd-close-btn:hover { background: rgba(255,255,255,0.22); }
+
+      /* Tab bar */
+      #mrd-tab-bar {
+        background: rgba(28,28,30,0.95);
+        border-radius: 30px;
+        padding: 5px 8px;
         display: flex;
-        min-height: 165px;
+        align-items: center;
+        gap: 2px;
+        margin-bottom: 10px;
+        overflow: hidden;
         position: relative;
       }
-      .mrd-col-left,
-      .mrd-col-right {
-        flex: 1;
-      }
-      .mrd-col-divider {
-        width: 1px;
-        background: rgba(255,255,255,0.06);
-        flex-shrink: 0;
-      }
-
-      .mrd-block3-footer {
-        height: 24px;
-        background: rgba(20, 8, 2, 0.60);
-        border-top: 1px solid rgba(255,255,255,0.04);
+      .mrd-tab-scroll {
         display: flex;
         align-items: center;
-        padding: 0 12px;
+        gap: 2px;
+        overflow-x: auto;
+        flex: 1;
+        scrollbar-width: none;
+      }
+      .mrd-tab-scroll::-webkit-scrollbar { display:none; }
+
+      .mrd-tab {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.55);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
         flex-shrink: 0;
       }
-      .mrd-footer-dots {
-        font-size: 12px;
-        color: rgba(255,255,255,0.30);
-        letter-spacing: 2px;
+      .mrd-tab:hover { color: rgba(255,255,255,0.85); }
+      .mrd-tab.active {
+        background: #1c1c1e;
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.5);
       }
+      .mrd-tab-arrow {
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        font-size: 13px;
+        color: rgba(255,255,255,0.7);
+        flex-shrink: 0;
+        transition: background 0.2s;
+      }
+      .mrd-tab-arrow:hover { background: rgba(255,255,255,0.2); }
+
+      /* White content panel */
+      #mrd-content-panel {
+        background: #ffffff;
+        border-radius: 16px;
+        min-height: 420px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .mrd-checkpoint-area {
+        flex: 1;
+        padding: 36px 44px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        min-height: 300px;
+      }
+
+      /* Slide animation */
+      .mrd-slide-enter { animation: mrdSlideIn 0.32s cubic-bezier(0.4,0,0.2,1); }
+      .mrd-slide-exit  { animation: mrdSlideOut 0.24s ease forwards; }
+      @keyframes mrdSlideIn  { from{opacity:0;transform:translateX(38px)} to{opacity:1;transform:translateX(0)} }
+      @keyframes mrdSlideOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(-38px)} }
+      .mrd-slide-enter-rev { animation: mrdSlideInRev 0.32s cubic-bezier(0.4,0,0.2,1); }
+      @keyframes mrdSlideInRev { from{opacity:0;transform:translateX(-38px)} to{opacity:1;transform:translateX(0)} }
+
+      .mrd-checkpoint-num {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(0,0,0,0.35);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+      }
+      .mrd-checkpoint-text {
+        font-size: 17px;
+        font-weight: 600;
+        color: #1c1c1e;
+        line-height: 1.5;
+        margin-bottom: 28px;
+        max-width: 560px;
+      }
+
+      /* Action buttons: N/A | Pending | Reviewed */
+      .mrd-action-row {
+        display: flex;
+        gap: 10px;
+        position: absolute;
+        right: 36px;
+        top: 36px;
+      }
+      .mrd-action-btn {
+        padding: 8px 18px;
+        border-radius: 22px;
+        border: none;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        background: #2563EB;
+        color: #fff;
+        transition: all 0.18s;
+        box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+      }
+      .mrd-action-btn:hover { background: #1d4ed8; transform:translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,0.4); }
+      .mrd-action-btn.selected-na      { background:#6b7280; box-shadow:0 2px 8px rgba(107,114,128,0.4); }
+      .mrd-action-btn.selected-pending { background:#f59e0b; box-shadow:0 2px 8px rgba(245,158,11,0.4); }
+      .mrd-action-btn.selected-reviewed{ background:#16a34a; box-shadow:0 2px 8px rgba(22,163,74,0.4); }
+
+      .mrd-clear-btn {
+        background: none;
+        border: 1px solid rgba(0,0,0,0.15);
+        border-radius: 6px;
+        font-size: 10px;
+        color: rgba(0,0,0,0.4);
+        padding: 3px 8px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.15s;
+        margin-left: 4px;
+        align-self: flex-start;
+      }
+      .mrd-clear-btn:hover { color:rgba(0,0,0,0.7); border-color:rgba(0,0,0,0.3); }
+
+      /* Bottom bar: prev + progress */
+      .mrd-bottom-bar {
+        padding: 16px 36px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-top: 1px solid rgba(0,0,0,0.06);
+        background: rgba(248,248,248,0.9);
+      }
+      .mrd-prev-btn {
+        background: none;
+        border: 1.5px solid rgba(0,0,0,0.18);
+        border-radius: 8px;
+        padding: 7px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(0,0,0,0.5);
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.18s;
+        flex-shrink: 0;
+      }
+      .mrd-prev-btn:hover { border-color:rgba(0,0,0,0.4); color:rgba(0,0,0,0.8); }
+      .mrd-prev-btn:disabled { opacity:0.3; cursor:default; }
+
+      .mrd-progress-wrap { flex:1; display:flex; flex-direction:column; gap:4px; }
+      .mrd-progress-label { font-size:10px; color:rgba(0,0,0,0.4); text-align:center; }
+      .mrd-progress-track { height:6px; background:rgba(0,0,0,0.10); border-radius:6px; overflow:hidden; }
+      .mrd-progress-fill {
+        height:100%;
+        border-radius:6px;
+        background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+      }
+
+      .mrd-status-chip {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 8px;
+      }
+      .chip-na       { background:#e5e7eb; color:#374151; }
+      .chip-pending  { background:#fef3c7; color:#92400e; }
+      .chip-reviewed { background:#d1fae5; color:#065f46; }
     </style>
 
+    <!-- ─────────────────────────────────────────────────────────
+         MAIN UI (3 blocks)
+    ─────────────────────────────────────────────────────────── -->
     <div id="meridian-ui">
-      <!-- TOP ROW: Block 1 + Block 2 -->
       <div id="mrd-top-row">
 
-        <!-- ── BLOCK 1: Input Form ─────────────────────────── -->
+        <!-- BLOCK 1: Input Form -->
         <div id="mrd-block1" class="mrd-panel">
           <div class="mrd-field-group">
             <label class="mrd-label">Equipment Tag No.</label>
-            <input class="mrd-input" type="text" placeholder="e.g. V-1001-A" />
+            <input class="mrd-input" type="text" id="inp-tag" />
           </div>
           <div class="mrd-field-group">
             <label class="mrd-label">Equipment Name</label>
-            <input class="mrd-input" type="text" placeholder="e.g. Feed Drum" />
+            <input class="mrd-input" type="text" id="inp-name" />
           </div>
           <div class="mrd-field-group">
             <label class="mrd-label">Equipment PO Number</label>
-            <input class="mrd-input" type="text" placeholder="e.g. PO-2024-0042" />
+            <input class="mrd-input" type="text" id="inp-po" />
           </div>
         </div>
 
-        <!-- ── BLOCK 2: Icon Grid ──────────────────────────── -->
+        <!-- BLOCK 2: Icon Grid -->
         <div id="mrd-block2" class="mrd-panel">
-          <div class="mrd-icon-grid">
+          <div class="mrd-icon-grid" id="mrd-icon-grid">
+            <!-- icons injected by JS -->
+          </div>
+        </div>
+      </div>
 
-            <!-- 1. Design Condition -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #3478F6, #0A56D0);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="5" y="4" width="16" height="18" rx="2" stroke="white" stroke-width="1.7"/>
-                  <line x1="8.5" y1="9" x2="17.5" y2="9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                  <line x1="8.5" y1="13" x2="17.5" y2="13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                  <line x1="8.5" y1="17" x2="13.5" y2="17" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                  <circle cx="7" cy="9" r="1" fill="white"/>
-                  <circle cx="7" cy="13" r="1" fill="white"/>
-                  <circle cx="7" cy="17" r="1" fill="white"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Design Cond.</span>
-            </div>
-
-            <!-- 2. Internals -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #636366, #3A3A3C);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="13" cy="9" r="3.5" stroke="white" stroke-width="1.7"/>
-                  <path d="M5 22c0-4.418 3.582-7 8-7s8 2.582 8 7" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Internals</span>
-            </div>
-
-            <!-- 3. Nozzles — Calendar style -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #FF453A, #FF2D20);">
-                <div class="mrd-cal-icon">
-                  <span class="mrd-cal-day">WED</span>
-                  <span class="mrd-cal-num">22</span>
-                </div>
-              </div>
-              <span class="mrd-icon-label">Nozzles</span>
-            </div>
-
-            <!-- 4. Mixers — multi-petal flower / photos icon -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #FF9F0A, #FF6B00);">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- centre circle -->
-                  <circle cx="14" cy="14" r="3" fill="white" opacity="0.95"/>
-                  <!-- 6 petals -->
-                  <ellipse cx="14" cy="7" rx="2.4" ry="3.8" fill="white" opacity="0.82"/>
-                  <ellipse cx="14" cy="21" rx="2.4" ry="3.8" fill="white" opacity="0.72"/>
-                  <ellipse cx="7.5" cy="10.5" rx="2.4" ry="3.8" transform="rotate(-60 7.5 10.5)" fill="white" opacity="0.88"/>
-                  <ellipse cx="20.5" cy="17.5" rx="2.4" ry="3.8" transform="rotate(-60 20.5 17.5)" fill="white" opacity="0.68"/>
-                  <ellipse cx="7.5" cy="17.5" rx="2.4" ry="3.8" transform="rotate(60 7.5 17.5)" fill="white" opacity="0.75"/>
-                  <ellipse cx="20.5" cy="10.5" rx="2.4" ry="3.8" transform="rotate(60 20.5 10.5)" fill="white" opacity="0.90"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Mixers</span>
-            </div>
-
-            <!-- 5. Mounted Equipment -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #0A84FF, #0060E0);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 18L13 6l9 12H4Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
-                  <rect x="9" y="13" width="8" height="7" rx="1" stroke="white" stroke-width="1.5"/>
-                  <line x1="13" y1="13" x2="13" y2="20" stroke="white" stroke-width="1.3"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Mounted Equip.</span>
-            </div>
-
-            <!-- 6. Platforms -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #2C2C2E, #1C1C1E);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="5" y="7" width="16" height="3" rx="1.5" fill="white" opacity="0.9"/>
-                  <rect x="5" y="13" width="16" height="3" rx="1.5" fill="white" opacity="0.7"/>
-                  <rect x="5" y="19" width="10" height="3" rx="1.5" fill="white" opacity="0.5"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Platforms</span>
-            </div>
-
-            <!-- 7. Internal Head -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #FF453A, #C0392B);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="7.5" cy="9" r="1.5" fill="white"/>
-                  <line x1="11" y1="9" x2="21" y2="9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                  <circle cx="7.5" cy="14" r="1.5" fill="white"/>
-                  <line x1="11" y1="14" x2="21" y2="14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                  <circle cx="7.5" cy="19" r="1.5" fill="white"/>
-                  <line x1="11" y1="19" x2="17" y2="19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Internal Head</span>
-            </div>
-
-            <!-- 8. Support — colourful floral / gem icon -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #FF6B9D, #E040FB, #7C4DFF);">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Diamond gem outline -->
-                  <polygon points="14,4 22,11 14,24 6,11" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
-                  <!-- Facet lines -->
-                  <line x1="6" y1="11" x2="22" y2="11" stroke="white" stroke-width="1.2" opacity="0.7"/>
-                  <line x1="14" y1="4" x2="6" y2="11" stroke="white" stroke-width="1" opacity="0.5"/>
-                  <line x1="14" y1="4" x2="22" y2="11" stroke="white" stroke-width="1" opacity="0.5"/>
-                  <line x1="14" y1="24" x2="6" y2="11" stroke="white" stroke-width="1" opacity="0.5"/>
-                  <line x1="14" y1="24" x2="22" y2="11" stroke="white" stroke-width="1" opacity="0.5"/>
-                  <line x1="14" y1="4" x2="14" y2="24" stroke="white" stroke-width="1" opacity="0.35"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Support</span>
-            </div>
-
-            <!-- 9. Transportation -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #FF9500, #E65100);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Pencil/pen icon -->
-                  <rect x="14.5" y="4" width="5" height="14" rx="1.5" transform="rotate(40 14.5 4)" stroke="white" stroke-width="1.6"/>
-                  <path d="M6 20l2-5 3 3-5 2Z" fill="white" opacity="0.9"/>
-                  <line x1="15" y1="7" x2="19" y2="11" stroke="white" stroke-width="1.3" opacity="0.6"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Transportation</span>
-            </div>
-
-            <!-- 10. External Attachment -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #30D158, #00A550);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="5" y="18" width="4" height="4" rx="1" fill="white" opacity="0.7"/>
-                  <rect x="11" y="13" width="4" height="9" rx="1" fill="white" opacity="0.85"/>
-                  <rect x="17" y="7" width="4" height="15" rx="1" fill="white"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Ext. Attachment</span>
-            </div>
-
-            <!-- 11. Material -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #0A84FF, #40C8E0);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Presentation screen -->
-                  <rect x="4" y="5" width="18" height="13" rx="2" stroke="white" stroke-width="1.7"/>
-                  <line x1="13" y1="18" x2="13" y2="22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                  <line x1="9" y1="22" x2="17" y2="22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                  <polyline points="7,14 10,10 13,12 16,8 19,10" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Material</span>
-            </div>
-
-            <!-- 12. Export -->
-            <div class="mrd-icon-cell">
-              <div class="mrd-icon-square" style="background: linear-gradient(135deg, #30D158, #0A84FF);">
-                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Circular arrow (export) -->
-                  <path d="M13 5a8 8 0 1 0 7.2 4.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-                  <polyline points="18,5 20.2,9.5 15.5,10.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <span class="mrd-icon-label">Export</span>
-            </div>
-
-          </div><!-- /.mrd-icon-grid -->
-        </div><!-- /#mrd-block2 -->
-
-      </div><!-- /#mrd-top-row -->
-
-      <!-- ── BLOCK 3: Exports Panel ──────────────────────────── -->
+      <!-- BLOCK 3: Exports Panel -->
       <div id="mrd-block3" class="mrd-panel">
-
-        <!-- Header row -->
         <div class="mrd-block3-header">
           <div class="mrd-folder-icon">
-            <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
               <path d="M1 3C1 2.448 1.448 2 2 2h5l2 2h9c.552 0 1 .448 1 1v8c0 .552-.448 1-1 1H2c-.552 0-1-.448-1-1V3Z" fill="white" opacity="0.9"/>
               <rect x="1" y="5" width="18" height="9" rx="1" fill="white" opacity="0.55"/>
             </svg>
           </div>
           <div class="mrd-header-titles">
             <span class="mrd-header-title">Exports</span>
-            <span class="mrd-header-recents">
-              <span class="mrd-recents-dot"></span>
-              Recents
-            </span>
+            <span class="mrd-header-recents"><span class="mrd-recents-dot"></span>Recents</span>
           </div>
           <span class="mrd-header-more">•••</span>
         </div>
-
-        <!-- Content area — two empty columns -->
         <div class="mrd-block3-content">
-          <div class="mrd-col-left"></div>
+          <div class="mrd-col-left" id="mrd-exports-left">
+            <div style="font-size:11px;color:rgba(255,255,255,0.25);padding-top:8px;">No recent exports</div>
+          </div>
           <div class="mrd-col-divider"></div>
-          <div class="mrd-col-right"></div>
+          <div class="mrd-col-right" id="mrd-exports-right"></div>
         </div>
+        <div class="mrd-block3-footer"><span class="mrd-footer-dots">•••</span></div>
+      </div>
+    </div>
 
-        <!-- Footer -->
-        <div class="mrd-block3-footer">
-          <span class="mrd-footer-dots">•••</span>
+    <!-- ─────────────────────────────────────────────────────────
+         OVERLAY + CHECKLIST PANEL
+    ─────────────────────────────────────────────────────────── -->
+    <div id="mrd-overlay"></div>
+
+    <div id="mrd-checklist-panel" style="display:none;">
+      <button id="mrd-close-btn" onclick="mrdClose()">✕</button>
+      <div id="mrd-tab-bar">
+        <div class="mrd-tab-arrow" id="mrd-tab-left" onclick="mrdScrollTabs(-1)">‹</div>
+        <div class="mrd-tab-scroll" id="mrd-tab-scroll"></div>
+        <div class="mrd-tab-arrow" id="mrd-tab-right" onclick="mrdScrollTabs(1)">›</div>
+      </div>
+      <div id="mrd-content-panel">
+        <div class="mrd-checkpoint-area" id="mrd-checkpoint-area">
+          <!-- rendered by JS -->
         </div>
+        <div class="mrd-bottom-bar">
+          <button class="mrd-prev-btn" id="mrd-prev-btn" onclick="mrdPrev()">← Previous</button>
+          <div class="mrd-progress-wrap">
+            <div class="mrd-progress-label" id="mrd-prog-label">0 / 10 completed</div>
+            <div class="mrd-progress-track">
+              <div class="mrd-progress-fill" id="mrd-prog-fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      </div><!-- /#mrd-block3 -->
+    <script>
+    // ═══════════════════════════════════════════════════════
+    //  DATA
+    // ═══════════════════════════════════════════════════════
+    const MRD_ICONS = [
+      {
+        id: 'design-condition',
+        label: 'Design Condition',
+        gradient: 'linear-gradient(135deg,#3478F6,#0A56D0)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="5" y="4" width="16" height="18" rx="2" stroke="white" stroke-width="1.7"/>
+          <line x1="9" y1="9" x2="17" y2="9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="9" y1="13" x2="17" y2="13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="9" y1="17" x2="14" y2="17" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <polyline points="8,8.5 8,9.5" stroke="white" stroke-width="1.2"/>
+        </svg>`,
+        checks: [
+          "Verify design pressure and temperature match equipment datasheet (MDS).",
+          "Confirm operating pressure and temperature are within design limits.",
+          "Check MDMT (Minimum Design Metal Temperature) is specified and matches MDS.",
+          "Verify hydrotest pressure is correctly calculated (≥1.3 × MAWP × Sa/S).",
+          "Confirm corrosion allowance is specified for shell, heads, and nozzles.",
+          "Check radiography extent (Full RT/Spot RT/No RT) matches MDS and code.",
+          "Verify PWHT requirement is indicated and consistent with material and service.",
+          "Confirm impact testing requirement matches MDMT and material specification.",
+          "Verify wind and seismic design codes match project design basis.",
+          "Check that all design conditions (full vacuum, cyclic, lethal service) are flagged."
+        ]
+      },
+      {
+        id: 'internals',
+        label: 'Internals',
+        gradient: 'linear-gradient(135deg,#636366,#3A3A3C)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="5" y="4" width="16" height="18" rx="2" stroke="white" stroke-width="1.7"/>
+          <line x1="5" y1="11" x2="21" y2="11" stroke="white" stroke-width="1.3" opacity="0.6"/>
+          <line x1="5" y1="16" x2="21" y2="16" stroke="white" stroke-width="1.3" opacity="0.6"/>
+          <circle cx="13" cy="7.5" r="1.5" fill="white" opacity="0.8"/>
+          <rect x="9" y="12.5" width="8" height="2" rx="1" fill="white" opacity="0.7"/>
+          <rect x="9" y="17.5" width="8" height="2" rx="1" fill="white" opacity="0.5"/>
+        </svg>`,
+        checks: [
+          "Verify all internals shown on drawing can be installed/removed through the manway.",
+          "Confirm demister pad position and material match MDS (SS316/316L standard).",
+          "Check vortex breaker type (flush/inside projection) and vane thickness = 3mm + 2×CA.",
+          "Verify impingement plate dimensions, material, and attachment per LESA.",
+          "Confirm baffles (number, orientation, clearance) match MDS and process requirements.",
+          "Verify internal coil routing, material, and drain provisions per MDS.",
+          "Check dip pipe length, anti-syphon hole presence, and orientation.",
+          "Confirm distributor type and elevation matches MDS for inlet flows.",
+          "Verify coalescer pack dimensions, material, and support arrangements.",
+          "Check that all internal components have identical material to shell or per MDS."
+        ]
+      },
+      {
+        id: 'nozzles',
+        label: 'Nozzles',
+        gradient: 'linear-gradient(135deg,#FF453A,#FF2D20)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <ellipse cx="13" cy="13" rx="7" ry="7" stroke="white" stroke-width="1.8"/>
+          <line x1="13" y1="4" x2="13" y2="6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="13" y1="20" x2="13" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4" y1="13" x2="6" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="20" y1="13" x2="22" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <rect x="10" y="10" width="6" height="6" rx="1" fill="white" opacity="0.7"/>
+        </svg>`,
+        checks: [
+          "Verify ALL nozzles from LESA appear on vendor drawing — none missing, none extra.",
+          "Check mark/tag, quantity, and service of each nozzle against LESA/MDS.",
+          "Verify flange rating (Class 150/300/600/900/1500/2500) matches MDS for each nozzle.",
+          "Confirm flange facing (RF/RTJ/FF/LJ) and surface finish (125-250 AARH for RF).",
+          "Check nozzle neck schedule meets design pressure, CA, and flange rating requirements.",
+          "Verify minimum nozzle projection: ≥200mm for NPS≤8; ≥250mm for NPS>8.",
+          "Confirm bolt holes straddle natural centrelines on all fixed flanges.",
+          "Verify tell-tale hole (6mm NPT) is present on all reinforcing pads ≥2\" nozzles.",
+          "Check manway size matches LESA — minimum NPS 20 (NPS 24 recommended with internals).",
+          "Verify all process nozzle elevations and orientations match LESA within tolerance."
+        ]
+      },
+      {
+        id: 'mixers',
+        label: 'Mixers',
+        gradient: 'linear-gradient(135deg,#FF9F0A,#FF6B00)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <circle cx="13" cy="13" r="3" stroke="white" stroke-width="1.8"/>
+          <line x1="13" y1="4" x2="13" y2="10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="13" y1="16" x2="13" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4" y1="13" x2="10" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="16" y1="13" x2="22" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="6.5" y1="6.5" x2="10.8" y2="10.8" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="15.2" y1="15.2" x2="19.5" y2="19.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>`,
+        checks: [
+          "Verify mixer nozzle (entry point) size, orientation, and flange rating match MDS.",
+          "Confirm mixer shaft seal type (mechanical/gland) is as specified.",
+          "Check mixer impeller type, diameter, and number of stages match process requirement.",
+          "Verify mixer support structure attachment to vessel — welded bracket design.",
+          "Confirm drive motor mounting arrangement and power rating match datasheet.",
+          "Check that mixer nozzle is not located in the dished head straight flange zone.",
+          "Verify baffle arrangement is compatible with mixer design to prevent vortexing.",
+          "Confirm anti-rotation device (torque arm) is shown and properly sized.",
+          "Check that mixer components can be removed through available access openings.",
+          "Verify vendor has confirmed seal flush/cooling arrangement per process requirements."
+        ]
+      },
+      {
+        id: 'mounted-equip',
+        label: 'Mounted Equip.',
+        gradient: 'linear-gradient(135deg,#0A84FF,#0060E0)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="4" y="8" width="10" height="14" rx="1.5" stroke="white" stroke-width="1.7"/>
+          <rect x="14" y="10" width="8" height="10" rx="1.5" stroke="white" stroke-width="1.5"/>
+          <line x1="9" y1="8" x2="9" y2="4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="6" y1="4" x2="12" y2="4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="14" y1="15" x2="14" y2="22" stroke="white" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+          <line x1="22" y1="15" x2="22" y2="22" stroke="white" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+        </svg>`,
+        checks: [
+          "Verify heat exchanger mounting bracket design, weld size, and material match MDS.",
+          "Confirm intermediate skirt arrangement for stacked vessel configuration per LESA.",
+          "Check that all mounted equipment loads are reflected in vessel foundation loads.",
+          "Verify pipe connections between mounted equipment and vessel match P&ID.",
+          "Confirm access provisions (platforms/ladders) are provided for all mounted equipment.",
+          "Check nozzle reinforcement adequacy for any locally mounted equipment loads.",
+          "Verify weight of mounted equipment is included in lifting weight calculation.",
+          "Confirm that equipment mounting does not conflict with insulation or fireproofing.",
+          "Check that mounted equipment item tags are correctly labelled on vendor drawing.",
+          "Verify vendor scope includes all mounting hardware (bolts, gaskets, brackets)."
+        ]
+      },
+      {
+        id: 'platforms',
+        label: 'Platforms',
+        gradient: 'linear-gradient(135deg,#2C2C2E,#1C1C1E)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="4" y="8" width="18" height="3" rx="1.5" fill="white" opacity="0.9"/>
+          <rect x="4" y="14" width="14" height="3" rx="1.5" fill="white" opacity="0.65"/>
+          <rect x="4" y="20" width="10" height="3" rx="1.5" fill="white" opacity="0.4"/>
+          <line x1="6" y1="8" x2="6" y2="23" stroke="white" stroke-width="1.3" opacity="0.4"/>
+        </svg>`,
+        checks: [
+          "Verify platform clip locations match Civil/Structural platform drawings.",
+          "Confirm platform clip material matches shell plate material (VEFV1120M Note 1).",
+          "Check 6mm vent holes are present in all platform clip pads.",
+          "Verify top platform provides adequate access to manway on top head.",
+          "Confirm circular/side platform provides access to all inter-bed manways.",
+          "Check handrail height meets minimum 1050mm requirement per project spec.",
+          "Verify stairway/ladder orientation does not conflict with nozzles or piping.",
+          "Confirm platform loading (dead + live load) is included in foundation loads.",
+          "Check that platform drawings are scheduled for delivery per VDDR timeline.",
+          "Verify davit/hoist provision is shown for top head manway access where required."
+        ]
+      },
+      {
+        id: 'internal-head',
+        label: 'Internal Head',
+        gradient: 'linear-gradient(135deg,#FF453A,#C0392B)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <path d="M5 14 Q13 5 21 14" stroke="white" stroke-width="1.8" fill="none"/>
+          <line x1="5" y1="14" x2="21" y2="14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="9" cy="17" r="2" stroke="white" stroke-width="1.4" fill="none"/>
+          <circle cx="17" cy="17" r="2" stroke="white" stroke-width="1.4" fill="none"/>
+          <line x1="11" y1="17" x2="15" y2="17" stroke="white" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/>
+        </svg>`,
+        checks: [
+          "Verify internal head type (hemispherical/ellipsoidal/toriconical) matches MDS.",
+          "Confirm internal head minimum thickness after forming meets calculated requirement.",
+          "Check fluid flow perforations — size, number, and pattern match process design.",
+          "Verify internal head is not welded to shell at a circumferential seam location.",
+          "Confirm torispherical crown radius does not exceed shell ID per UG-32.",
+          "Check internal head knuckle radius ≥6% of shell ID to avoid stress concentration.",
+          "Verify internal head straight flange length matches code minimum per UG-32.",
+          "Confirm material of internal head matches shell or is suitable per MDS.",
+          "Check that weep holes / drain holes are included at low points of internal heads.",
+          "Verify internal head clearance to shell does not restrict flow or access for inspection."
+        ]
+      },
+      {
+        id: 'support',
+        label: 'Support',
+        gradient: 'linear-gradient(135deg,#FF6B9D,#E040FB,#7C4DFF)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="9" y="3" width="8" height="12" rx="1.5" stroke="white" stroke-width="1.7"/>
+          <line x1="13" y1="15" x2="13" y2="20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="6" y1="20" x2="20" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <line x1="6" y1="23" x2="20" y2="23" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+          <line x1="6" y1="20" x2="6" y2="23" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+          <line x1="20" y1="20" x2="20" y2="23" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        </svg>`,
+        checks: [
+          "Verify skirt outer diameter (= vessel OD) and skirt thickness match LESA/MDS.",
+          "Confirm skirt height (base plane to bottom TL) matches LESA — Piping coordination required.",
+          "Check skirt-to-head joint type (VEFV1128M Types A/B/C) matches design conditions.",
+          "Verify BCD (Bolt Circle Diameter) matches MDS — any deviation prevents installation.",
+          "Confirm number and diameter of anchor bolt holes match MDS (minimum M20).",
+          "Check anchor bolt holes straddle centrelines (N-S and E-W) per VECV1001.",
+          "Verify base plate type (VEFV1107M-1110M) matches anchor bolt size requirement.",
+          "Check skirt access holes: ≥1 for ID<1500mm; ≥2 (180° apart) for ID>1500mm.",
+          "Verify skirt pipe vents: 2 vents for skirt ≤750mm; 4 vents for skirt >750mm.",
+          "Confirm skirt longitudinal welds do not interfere with sleeves, access holes, or vents."
+        ]
+      },
+      {
+        id: 'transportation',
+        label: 'Transportation',
+        gradient: 'linear-gradient(135deg,#FF9500,#E65100)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="3" y="9" width="20" height="10" rx="2" stroke="white" stroke-width="1.7"/>
+          <circle cx="8" cy="19" r="2.5" stroke="white" stroke-width="1.5" fill="none"/>
+          <circle cx="18" cy="19" r="2.5" stroke="white" stroke-width="1.5" fill="none"/>
+          <line x1="3" y1="13" x2="23" y2="13" stroke="white" stroke-width="1.2" opacity="0.5"/>
+          <line x1="15" y1="9" x2="15" y2="13" stroke="white" stroke-width="1.2" opacity="0.5"/>
+          <rect x="16" y="6" width="7" height="3" rx="1" stroke="white" stroke-width="1.3" opacity="0.7"/>
+        </svg>`,
+        checks: [
+          "Verify transport weight matches MDS — check for additional components not accounted for.",
+          "Confirm 'CENTER OF GRAVITY' marking (200mm letters) is noted on both sides of vessel.",
+          "Check shipping saddle design, number, and position for horizontal transport.",
+          "Verify temporary support/bracing provisions for internals during transportation.",
+          "Confirm all nozzle protection covers are indicated for transport.",
+          "Check lifting lug orientation per ITG-133-007 — no interference with nozzles/piping.",
+          "Verify tailing lug location and capacity matches Heavy Lift requirements.",
+          "Confirm packaging requirements (moisture protection, inert gas) are noted.",
+          "Check that insulation is either removed or specially protected for transport.",
+          "Verify vendor has confirmed final transport weight and CoG location."
+        ]
+      },
+      {
+        id: 'ext-attachment',
+        label: 'Ext. Attachment',
+        gradient: 'linear-gradient(135deg,#30D158,#00A550)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="5" y="19" width="4" height="4" rx="1" fill="white" opacity="0.7"/>
+          <rect x="11" y="14" width="4" height="9" rx="1" fill="white" opacity="0.85"/>
+          <rect x="17" y="8" width="4" height="15" rx="1" fill="white"/>
+          <line x1="7" y1="6" x2="7" y2="19" stroke="white" stroke-width="1.3" opacity="0.45" stroke-linecap="round"/>
+          <line x1="13" y1="6" x2="13" y2="14" stroke="white" stroke-width="1.3" opacity="0.45" stroke-linecap="round"/>
+        </svg>`,
+        checks: [
+          "Verify all stiffening rings (number, elevation, section size) match LESA.",
+          "Check 25mm unwelded segments every metre for double-fillet welded rings (ventilation).",
+          "Confirm insulation support type and spacing (≤915mm for standard, ≤600mm for thick insulation).",
+          "Verify nameplate bracket location and material match VEFV1101M.",
+          "Check grounding lug presence, number, and material (austenitic SS if on CS/LA) per VEFV1103M.",
+          "Confirm grounding lugs are flagged as 'not to be painted' per VEFV1103M Note 3.",
+          "Verify piping support clips match Piping summary report (ITG-133-001).",
+          "Check 6mm vent holes in all piping support clip pads per VEFV1120M Note 1.",
+          "Confirm platform clip reactions match Civil drawings and that vendor validates loads.",
+          "Verify fireproofing crown ring at skirt-to-vessel transition is shown where required."
+        ]
+      },
+      {
+        id: 'material',
+        label: 'Material',
+        gradient: 'linear-gradient(135deg,#0A84FF,#40C8E0)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="4" y="5" width="18" height="13" rx="2" stroke="white" stroke-width="1.7"/>
+          <line x1="13" y1="18" x2="13" y2="22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="9" y1="22" x2="17" y2="22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <polyline points="7,14 10,10 13,12 16,8 19,10" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>`,
+        checks: [
+          "Verify shell and heads material matches MDS exactly — grade, class, and delivery condition.",
+          "Confirm flange and forging material matches MDS. For Sour/H2S: SA-350 LF2 or SA-182 F22.",
+          "Check stud bolt and nut material matches MDS throughout. Flag any B7/B7M mix.",
+          "Verify external gasket material and RTJ ring type (octagonal/oval) matches MDS.",
+          "Confirm skirt, base ring, and chair material matches MDS (may differ from shell).",
+          "Verify external accessories welded to pressure parts are same material as parent.",
+          "Check internal materials: welded internals same composition as cladding/shell per VECV1001.",
+          "Confirm overlay/clad: type, composition (ER309L/ER347/etc.), and minimum thickness per MDS.",
+          "Verify all material certificates and test requirements (impact, PWHT) are in VDDR.",
+          "Check nameplate material (e.g. SS316) and grounding lug material are correct."
+        ]
+      },
+      {
+        id: 'export',
+        label: 'Export',
+        gradient: 'linear-gradient(135deg,#30D158,#0A84FF)',
+        svg: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <path d="M13 5a8 8 0 1 0 7.2 4.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <polyline points="18,5 20.2,9.5 15.5,10.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="13" y1="11" x2="13" y2="18" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+          <polyline points="10,15 13,18 16,15" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`,
+        checks: [
+          "Review all completed checklist sections and confirm statuses are finalized.",
+          "Verify Equipment Tag No., Name, and PO Number are filled in Block 1.",
+          "Confirm all 12 checklist sections have been visited and reviewed.",
+          "Check that no critical items are left 'Pending' before export.",
+          "Verify export file name will include equipment tag for identification.",
+          "Confirm Excel export will include all 4 columns: Vessel / Section / Checkpoint / Status.",
+          "Check that exported file will be saved to Exports panel for download.",
+          "Verify date and time stamp will be included in the exported file.",
+          "Confirm that 'Pending' items are highlighted in the export for follow-up.",
+          "Click EXPORT TO EXCEL below to generate the review report."
+        ]
+      }
+    ];
 
-    </div><!-- /#meridian-ui -->
+    // ═══════════════════════════════════════════════════════
+    //  STATE
+    // ═══════════════════════════════════════════════════════
+    const mrdState = {
+      activeIconIdx: 0,
+      activeCheckIdx: 0,
+      answers: {}, // key: "iconIdx-checkIdx", value: "na"|"pending"|"reviewed"
+      exports: []  // [{name, time, data, blob}]
+    };
 
+    // ═══════════════════════════════════════════════════════
+    //  BUILD ICON GRID
+    // ═══════════════════════════════════════════════════════
+    function mrdBuildGrid() {
+      const grid = document.getElementById('mrd-icon-grid');
+      grid.innerHTML = MRD_ICONS.map((ico, i) => `
+        <div class="mrd-icon-cell" onclick="mrdOpenIcon(${i})" id="mrd-cell-${i}">
+          <div class="mrd-icon-square" style="background:${ico.gradient};">${ico.svg}</div>
+          <span class="mrd-icon-label">${ico.label}</span>
+        </div>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  BUILD TAB BAR
+    // ═══════════════════════════════════════════════════════
+    function mrdBuildTabs(activeIdx) {
+      const scroll = document.getElementById('mrd-tab-scroll');
+      scroll.innerHTML = MRD_ICONS.map((ico, i) => `
+        <div class="mrd-tab${i===activeIdx?' active':''}" id="mrd-tab-${i}" onclick="mrdSwitchTab(${i})">${ico.label}</div>
+      `).join('');
+      // Scroll active tab into view
+      setTimeout(() => {
+        const activeTab = document.getElementById('mrd-tab-' + activeIdx);
+        if (activeTab) activeTab.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+      }, 50);
+    }
+
+    function mrdScrollTabs(dir) {
+      const scroll = document.getElementById('mrd-tab-scroll');
+      scroll.scrollBy({ left: dir * 160, behavior: 'smooth' });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  OPEN ICON / PANEL
+    // ═══════════════════════════════════════════════════════
+    function mrdOpenIcon(idx) {
+      mrdState.activeIconIdx = idx;
+      mrdState.activeCheckIdx = 0;
+
+      // Flip animation on icon
+      const cell = document.getElementById('mrd-cell-' + idx);
+      if (cell) {
+        cell.style.transition = 'transform 0.35s ease';
+        cell.style.transform = 'rotateY(180deg)';
+        setTimeout(() => {
+          cell.style.transform = 'rotateY(360deg)';
+          setTimeout(() => { cell.style.transform = ''; }, 350);
+        }, 180);
+      }
+
+      // Show overlay + panel
+      document.getElementById('mrd-overlay').classList.add('active');
+      const panel = document.getElementById('mrd-checklist-panel');
+      panel.style.display = 'flex';
+      panel.style.flexDirection = 'column';
+
+      mrdBuildTabs(idx);
+      mrdRenderCheckpoint('forward');
+    }
+
+    function mrdSwitchTab(idx) {
+      mrdState.activeIconIdx = idx;
+      mrdState.activeCheckIdx = 0;
+      mrdBuildTabs(idx);
+      mrdRenderCheckpoint('forward');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  RENDER CHECKPOINT
+    // ═══════════════════════════════════════════════════════
+    function mrdRenderCheckpoint(dir) {
+      const ico = MRD_ICONS[mrdState.activeIconIdx];
+      const ci  = mrdState.activeCheckIdx;
+      const key = mrdState.activeIconIdx + '-' + ci;
+      const ans = mrdState.answers[key] || null;
+      const total = ico.checks.length;
+
+      const area = document.getElementById('mrd-checkpoint-area');
+      area.innerHTML = `
+        <div class="mrd-action-row">
+          <button class="mrd-action-btn${ans==='na'?' selected-na':''}" onclick="mrdAnswer('na')">N/A</button>
+          <button class="mrd-action-btn${ans==='pending'?' selected-pending':''}" onclick="mrdAnswer('pending')">Pending</button>
+          <button class="mrd-action-btn${ans==='reviewed'?' selected-reviewed':''}" onclick="mrdAnswer('reviewed')">Reviewed</button>
+          <button class="mrd-clear-btn" onclick="mrdClear()">Clear</button>
+        </div>
+        <div class="mrd-checkpoint-num">${ico.label} &nbsp;·&nbsp; Checkpoint ${ci+1} of ${total}</div>
+        <div class="mrd-checkpoint-text mrd-slide-enter${dir==='back'?' mrd-slide-enter-rev':''}">${ico.checks[ci]}</div>
+        ${ans ? `<span class="mrd-status-chip ${ans==='na'?'chip-na':ans==='pending'?'chip-pending':'chip-reviewed'}">${ans==='na'?'N/A':ans==='pending'?'⏳ Pending':'✅ Reviewed'}</span>` : ''}
+      `;
+
+      // Update progress
+      mrdUpdateProgress();
+
+      // Prev button
+      const prevBtn = document.getElementById('mrd-prev-btn');
+      if (prevBtn) prevBtn.disabled = (ci === 0);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  ANSWER
+    // ═══════════════════════════════════════════════════════
+    function mrdAnswer(val) {
+      const ico = MRD_ICONS[mrdState.activeIconIdx];
+      const ci  = mrdState.activeCheckIdx;
+      const key = mrdState.activeIconIdx + '-' + ci;
+      mrdState.answers[key] = val;
+
+      const total = ico.checks.length;
+      if (ci < total - 1) {
+        // Slide to next
+        mrdState.activeCheckIdx++;
+        mrdRenderCheckpoint('forward');
+      } else {
+        mrdRenderCheckpoint('forward');
+      }
+    }
+
+    function mrdClear() {
+      const key = mrdState.activeIconIdx + '-' + mrdState.activeCheckIdx;
+      delete mrdState.answers[key];
+      mrdRenderCheckpoint('forward');
+    }
+
+    function mrdPrev() {
+      if (mrdState.activeCheckIdx > 0) {
+        mrdState.activeCheckIdx--;
+        mrdRenderCheckpoint('back');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  PROGRESS (counts na + reviewed as complete)
+    // ═══════════════════════════════════════════════════════
+    function mrdUpdateProgress() {
+      const ico   = MRD_ICONS[mrdState.activeIconIdx];
+      const iIdx  = mrdState.activeIconIdx;
+      const total = ico.checks.length;
+      let completed = 0;
+      for (let c = 0; c < total; c++) {
+        const v = mrdState.answers[iIdx + '-' + c];
+        if (v === 'na' || v === 'reviewed') completed++;
+      }
+      const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+      const fill = document.getElementById('mrd-prog-fill');
+      const label = document.getElementById('mrd-prog-label');
+      if (fill)  fill.style.width = pct + '%';
+      if (label) label.textContent = `${completed} / ${total} completed`;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CLOSE
+    // ═══════════════════════════════════════════════════════
+    function mrdClose() {
+      document.getElementById('mrd-overlay').classList.remove('active');
+      document.getElementById('mrd-checklist-panel').style.display = 'none';
+
+      // If export icon was used, trigger export
+      if (mrdState.activeIconIdx === 11) {
+        mrdExportToExcel();
+      }
+    }
+
+    // Close on overlay click
+    document.getElementById('mrd-overlay').addEventListener('click', mrdClose);
+
+    // ═══════════════════════════════════════════════════════
+    //  EXCEL EXPORT (CSV format compatible with Excel)
+    // ═══════════════════════════════════════════════════════
+    function mrdExportToExcel() {
+      const tag  = document.getElementById('inp-tag').value  || 'Unknown-Tag';
+      const name = document.getElementById('inp-name').value || 'Vertical Drum';
+      const po   = document.getElementById('inp-po').value   || 'N/A';
+      const dt   = new Date();
+      const dtStr = dt.toLocaleString();
+
+      // CSV header
+      let csv = `"Vessel","Section","Checkpoint","Status"\n`;
+      csv += `"${name} (${tag})","PO: ${po}","Review Date: ${dtStr}",""\n`;
+
+      MRD_ICONS.forEach((ico, iIdx) => {
+        ico.checks.forEach((chk, ci) => {
+          const key = iIdx + '-' + ci;
+          const ans = mrdState.answers[key] || 'Not Reviewed';
+          const statusLabel = ans === 'na' ? 'N/A' : ans === 'pending' ? 'Pending' : ans === 'reviewed' ? 'Reviewed' : 'Not Reviewed';
+          csv += `"${name}","${ico.label}","${chk.replace(/"/g,'""')}","${statusLabel}"\n`;
+        });
+      });
+
+      // Create blob
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const fileName = `MERIDIAN_Review_${tag}_${dt.getFullYear()}${String(dt.getMonth()+1).padStart(2,'0')}${String(dt.getDate()).padStart(2,'0')}.csv`;
+
+      // Add to exports list
+      const exportEntry = { name: fileName, time: dtStr, url, tag, name: name };
+      mrdState.exports.unshift(exportEntry);
+      mrdRenderExports();
+
+      // Auto-download
+      const a = document.createElement('a');
+      a.href = url; a.download = fileName;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  RENDER EXPORTS IN BLOCK 3
+    // ═══════════════════════════════════════════════════════
+    function mrdRenderExports() {
+      const leftCol  = document.getElementById('mrd-exports-left');
+      const rightCol = document.getElementById('mrd-exports-right');
+      if (!leftCol) return;
+
+      const all = mrdState.exports;
+      if (all.length === 0) {
+        leftCol.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.25);padding-top:8px;">No recent exports</div>';
+        rightCol.innerHTML = '';
+        return;
+      }
+
+      // Split into two columns
+      const left  = all.filter((_, i) => i % 2 === 0);
+      const right = all.filter((_, i) => i % 2 !== 0);
+
+      const renderItem = (e) => `
+        <div class="mrd-export-item">
+          <span class="mrd-export-icon">📊</span>
+          <div class="mrd-export-info">
+            <div class="mrd-export-name" title="${e.name}">${e.name}</div>
+            <div class="mrd-export-time">${e.time}</div>
+          </div>
+          <button class="mrd-download-btn" onclick="mrdDownload('${e.url}','${e.name}')">↓ Download</button>
+        </div>`;
+
+      leftCol.innerHTML  = left.map(renderItem).join('') || '<div style="font-size:11px;color:rgba(255,255,255,0.25);padding-top:8px;"></div>';
+      rightCol.innerHTML = right.map(renderItem).join('');
+    }
+
+    function mrdDownload(url, name) {
+      const a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  INIT
+    // ═══════════════════════════════════════════════════════
+    mrdBuildGrid();
+    </script>
 </body>
 </html>

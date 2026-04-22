@@ -356,10 +356,9 @@
 
       .mrd-checkpoint-area {
         flex: 1;
-        padding: 36px 44px 20px;
+        padding: 36px 44px 28px;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         position: relative;
         overflow: hidden;
         min-height: 300px;
@@ -394,9 +393,10 @@
       .mrd-action-row {
         display: flex;
         gap: 10px;
-        position: absolute;
-        right: 36px;
-        top: 36px;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: auto;
+        padding-top: 20px;
       }
       .mrd-action-btn {
         padding: 8px 18px;
@@ -943,8 +943,38 @@
     // ═══════════════════════════════════════════════════════
     //  RENDER CHECKPOINT
     // ═══════════════════════════════════════════════════════
+    function mrdRenderExportScreen() {
+      const area = document.getElementById('mrd-checkpoint-area');
+      let exported = false;
+      area.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;text-align:center;">
+          <div style="font-size:56px;margin-bottom:20px;">📊</div>
+          <div style="font-size:22px;font-weight:700;color:#1c1c1e;margin-bottom:12px;">Export Review Data</div>
+          <div style="font-size:14px;color:#6b7280;max-width:400px;line-height:1.6;margin-bottom:32px;">All checklist sections will be compiled into an Excel (.csv) file. Click below to generate and download.</div>
+          <button id="mrd-export-btn" onclick="mrdTriggerExport()" style="background:#2563EB;color:#fff;border:none;border-radius:22px;padding:14px 36px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(37,99,235,0.35);transition:all 0.18s;">⬇ Export to Excel</button>
+          <div id="mrd-export-success" style="display:none;margin-top:20px;color:#16a34a;font-weight:600;font-size:14px;">✅ Export complete! Check your downloads.</div>
+        </div>
+      `;
+      mrdUpdateProgress();
+      const prevBtn = document.getElementById('mrd-prev-btn');
+      if (prevBtn) prevBtn.disabled = true;
+    }
+
+    function mrdTriggerExport() {
+      mrdExportToExcel();
+      const btn = document.getElementById('mrd-export-btn');
+      const success = document.getElementById('mrd-export-success');
+      if (btn) { btn.textContent = '✅ Exported!'; btn.style.background = '#16a34a'; }
+      if (success) success.style.display = 'block';
+    }
+
     function mrdRenderCheckpoint(dir) {
       const ico = MRD_ICONS[mrdState.activeIconIdx];
+      // If export section, show export screen instead
+      if (ico.id === 'export') {
+        mrdRenderExportScreen();
+        return;
+      }
       const ci  = mrdState.activeCheckIdx;
       const key = mrdState.activeIconIdx + '-' + ci;
       const ans = mrdState.answers[key] || null;
@@ -952,15 +982,15 @@
 
       const area = document.getElementById('mrd-checkpoint-area');
       area.innerHTML = `
+        <div class="mrd-checkpoint-num">${ico.label} &nbsp;·&nbsp; Checkpoint ${ci+1} of ${total}</div>
+        <div class="mrd-checkpoint-text mrd-slide-enter${dir==='back'?' mrd-slide-enter-rev':''}">${ico.checks[ci]}</div>
+        ${ans ? `<span class="mrd-status-chip ${ans==='na'?'chip-na':ans==='pending'?'chip-pending':'chip-reviewed'}">${ans==='na'?'N/A':ans==='pending'?'⏳ Pending':'✅ Reviewed'}</span>` : ''}
         <div class="mrd-action-row">
           <button class="mrd-action-btn${ans==='na'?' selected-na':''}" onclick="mrdAnswer('na')">N/A</button>
           <button class="mrd-action-btn${ans==='pending'?' selected-pending':''}" onclick="mrdAnswer('pending')">Pending</button>
           <button class="mrd-action-btn${ans==='reviewed'?' selected-reviewed':''}" onclick="mrdAnswer('reviewed')">Reviewed</button>
           <button class="mrd-clear-btn" onclick="mrdClear()">Clear</button>
         </div>
-        <div class="mrd-checkpoint-num">${ico.label} &nbsp;·&nbsp; Checkpoint ${ci+1} of ${total}</div>
-        <div class="mrd-checkpoint-text mrd-slide-enter${dir==='back'?' mrd-slide-enter-rev':''}">${ico.checks[ci]}</div>
-        ${ans ? `<span class="mrd-status-chip ${ans==='na'?'chip-na':ans==='pending'?'chip-pending':'chip-reviewed'}">${ans==='na'?'N/A':ans==='pending'?'⏳ Pending':'✅ Reviewed'}</span>` : ''}
       `;
 
       // Update progress
@@ -982,11 +1012,22 @@
 
       const total = ico.checks.length;
       if (ci < total - 1) {
-        // Slide to next
+        // Not last checkpoint — just advance within same section
         mrdState.activeCheckIdx++;
         mrdRenderCheckpoint('forward');
       } else {
-        mrdRenderCheckpoint('forward');
+        // Last checkpoint of this section — auto-advance to next section
+        const nextIconIdx = mrdState.activeIconIdx + 1;
+        // Only auto-advance if next section exists and is not the Export section (id: 'export')
+        if (nextIconIdx < MRD_ICONS.length && MRD_ICONS[nextIconIdx].id !== 'export') {
+          mrdState.activeIconIdx = nextIconIdx;
+          mrdState.activeCheckIdx = 0;
+          mrdBuildTabs(nextIconIdx);
+          mrdRenderCheckpoint('forward');
+        } else {
+          // Next is export, or already at last section — stay on current checkpoint
+          mrdRenderCheckpoint('forward');
+        }
       }
     }
 
@@ -1028,11 +1069,6 @@
     function mrdClose() {
       document.getElementById('mrd-overlay').classList.remove('active');
       document.getElementById('mrd-checklist-panel').style.display = 'none';
-
-      // If export icon was used, trigger export
-      if (mrdState.activeIconIdx === 11) {
-        mrdExportToExcel();
-      }
     }
 
     // Close on overlay click

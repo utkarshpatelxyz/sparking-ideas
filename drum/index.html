@@ -1854,6 +1854,9 @@
     let s1OpenL1 = null;
     let s1OpenL2 = null;
     let s1OpenL3 = null; // for 4th column (grandchildren)
+    // Remember open L2/L3 per L1 section so switching sections doesn't lose your view
+    const s1OpenL2PerL1 = {};
+    const s1OpenL3PerL2 = {};
 
     // ── Tree data definition ─────────────────────────────────
     const S1_TREE_L1 = [
@@ -2035,9 +2038,22 @@
 
     // ── Click handlers ───────────────────────────────────────
     function s1ClickL1(id) {
-      s1OpenL1 = (s1OpenL1 === id) ? null : id;
-      s1OpenL2 = null;
-      s1OpenL3 = null;
+      if (s1OpenL1 === id) {
+        // Clicking the same L1 again — collapse it
+        s1OpenL1 = null;
+        s1OpenL2 = null;
+        s1OpenL3 = null;
+      } else {
+        // Save current L2/L3 state before switching sections
+        if (s1OpenL1) {
+          s1OpenL2PerL1[s1OpenL1] = s1OpenL2;
+          if (s1OpenL2) s1OpenL3PerL2[s1OpenL2] = s1OpenL3;
+        }
+        s1OpenL1 = id;
+        // Restore previously remembered L2/L3 for this L1 (if any)
+        s1OpenL2 = s1OpenL2PerL1[id] || null;
+        s1OpenL3 = (s1OpenL2 && s1OpenL3PerL2[s1OpenL2]) || null;
+      }
       s1Render();
     }
 
@@ -2048,15 +2064,35 @@
         if (s1Sel.has(id)) { s1Sel.delete(id); }
         else { s1Sel.add(id); s1OpenL2 = null; s1OpenL3 = null; }
       } else {
+        const hasChildren = node.children && node.children.length > 0;
         if (s1Sel.has(id)) {
-          s1Sel.delete(id);
-          if (node.children) node.children.forEach(c => { s1Sel.delete(c.id); if(c.children) c.children.forEach(gc => s1Sel.delete(gc.id)); });
-          if (s1OpenL2 === id) { s1OpenL2 = null; s1OpenL3 = null; }
+          if (hasChildren) {
+            // Already selected — toggle the panel open/closed WITHOUT deselecting
+            if (s1OpenL2 === id) {
+              // Panel is open — close it, but keep the selection intact
+              s1OpenL2 = null;
+              s1OpenL3 = null;
+            } else {
+              // Panel is closed — reopen it to view/edit children
+              s1OpenL2 = id;
+              s1OpenL3 = s1OpenL3PerL2[id] || null;
+            }
+          } else {
+            // No children — clicking again deselects (simple toggle)
+            s1Sel.delete(id);
+          }
         } else {
+          // Not yet selected — select it and open its children panel
           s1Sel.add(id);
-          s1OpenL2 = (node.children && node.children.length > 0) ? id : s1OpenL2;
-          s1OpenL3 = null;
+          if (hasChildren) {
+            // Save old L3 state for the previous L2
+            if (s1OpenL2) s1OpenL3PerL2[s1OpenL2] = s1OpenL3;
+            s1OpenL2 = id;
+            s1OpenL3 = s1OpenL3PerL2[id] || null;
+          }
         }
+        // Save the current L2 state for the active L1
+        if (s1OpenL1) s1OpenL2PerL1[s1OpenL1] = s1OpenL2;
       }
       s1Render();
     }
@@ -2064,13 +2100,28 @@
     function s1ClickL3(id) {
       const node = s1Map[id];
       if (!node) return;
+      const hasChildren = node.children && node.children.length > 0;
       if (s1Sel.has(id)) {
-        s1Sel.delete(id);
-        if (node.children) node.children.forEach(c => s1Sel.delete(c.id));
-        if (s1OpenL3 === id) s1OpenL3 = null;
+        if (hasChildren) {
+          // Toggle panel open/closed without deselecting
+          if (s1OpenL3 === id) {
+            s1OpenL3 = null;
+          } else {
+            s1OpenL3 = id;
+          }
+          // Save L3 state for the active L2
+          if (s1OpenL2) s1OpenL3PerL2[s1OpenL2] = s1OpenL3;
+        } else {
+          // No children — clicking again deselects
+          s1Sel.delete(id);
+        }
       } else {
         s1Sel.add(id);
-        if (node.children && node.children.length > 0) s1OpenL3 = id;
+        if (hasChildren) {
+          // Save old L3 before switching
+          if (s1OpenL2) s1OpenL3PerL2[s1OpenL2] = id;
+          s1OpenL3 = id;
+        }
       }
       s1Render();
     }
@@ -2200,6 +2251,9 @@
         if (t) t.value = cfg.equipmentTag;
         s1Sel.clear();
         (cfg.selections||[]).forEach(id => s1Sel.add(id));
+        // Clear and re-derive the open-state memory from saved selections
+        Object.keys(s1OpenL2PerL1).forEach(k => delete s1OpenL2PerL1[k]);
+        Object.keys(s1OpenL3PerL2).forEach(k => delete s1OpenL3PerL2[k]);
         s1Render();
       }
     }

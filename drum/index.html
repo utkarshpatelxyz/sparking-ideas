@@ -44,54 +44,48 @@
         }
     </style>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         STEP 1 — VESSEL BUILDER STYLES
-    ═══════════════════════════════════════════════════════════════ -->
+    <!-- STEP 1 STYLES -->
     <style>
-      /* ── Step 1 outer wrapper ─────────────────────────────── */
+      /* ── Outer fullscreen wrapper ── */
       #mrd-step1 {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
         overflow-y: auto;
-        padding: 70px 20px 40px;
+        padding: 68px 24px 40px;
         z-index: 200;
         display: flex;
         align-items: flex-start;
         justify-content: center;
       }
 
+      /* ── Main frosted card ── */
       #mrd-step1-card {
-        background: rgba(255, 255, 255, 0.82);
+        background: rgba(255,255,255,0.82);
         backdrop-filter: blur(28px) saturate(1.8);
         -webkit-backdrop-filter: blur(28px) saturate(1.8);
-        border-radius: 18px;
-        border: 1px solid rgba(255, 255, 255, 0.75);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.78);
         box-shadow:
-          0 8px 32px rgba(0,0,0,0.13),
-          0 2px 8px rgba(0,0,0,0.08),
-          0 20px 50px rgba(0,0,0,0.10),
+          0 8px 40px rgba(0,0,0,0.12),
+          0 2px 8px rgba(0,0,0,0.07),
           0 1px 0 rgba(255,255,255,0.9) inset;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
         -webkit-font-smoothing: antialiased;
         color: rgba(20,20,35,0.85);
         width: 100%;
-        max-width: 980px;
-        min-height: 500px;
+        max-width: 1020px;
+        min-height: 560px;
         display: flex;
         flex-direction: row;
         overflow: hidden;
       }
 
-      @media (max-width: 768px) {
-        #mrd-step1-card { flex-direction: column; }
-      }
-
-      /* ── Left: Vessel Illustration ─────────────────────────── */
+      /* ── LEFT: Vessel illustration panel ── */
       #mrd-s1-left {
-        width: 280px;
-        min-width: 220px;
-        background: rgba(240, 243, 248, 0.60);
-        border-right: 1px solid rgba(0,0,0,0.07);
+        width: 270px;
+        min-width: 240px;
+        background: rgba(245,247,252,0.65);
+        border-right: 1px solid rgba(0,0,0,0.06);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -99,306 +93,433 @@
         flex-shrink: 0;
       }
 
-      @media (max-width: 768px) {
-        #mrd-s1-left {
-          width: 100%;
-          min-height: 220px;
-          border-right: none;
-          border-bottom: 1px solid rgba(0,0,0,0.07);
-        }
-      }
-
-      /* ── Right: Builder Content ─────────────────────────────── */
+      /* ── RIGHT: Builder content ── */
       #mrd-s1-right {
         flex: 1;
-        padding: 36px 36px 36px 36px;
         display: flex;
         flex-direction: column;
         min-width: 0;
-        overflow-y: auto;
+        overflow: hidden;
       }
 
-      /* Opening screen */
+      /* ── Opening screen ── */
       #mrd-s1-opening {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 14px;
+        padding: 44px 40px;
       }
-      .mrd-s1-heading {
+      .s1-heading {
         font-size: 26px;
         font-weight: 800;
         color: rgba(20,20,35,0.88);
-        letter-spacing: -0.3px;
-        margin-bottom: 4px;
+        letter-spacing: -0.4px;
+        line-height: 1.15;
       }
-      .mrd-s1-sub {
+      .s1-sub {
         font-size: 13px;
-        color: rgba(20,20,35,0.45);
-        margin-bottom: 12px;
+        color: rgba(20,20,35,0.42);
+        line-height: 1.5;
+        margin-top: -4px;
       }
-      .mrd-s1-start-btn {
+      .s1-start-btn {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #2563EB;
+        background: rgba(20,20,35,0.88);
         color: #fff;
         border: none;
         border-radius: 22px;
-        padding: 12px 28px;
+        padding: 12px 26px;
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 600;
         cursor: pointer;
         font-family: inherit;
-        box-shadow: 0 4px 16px rgba(37,99,235,0.3);
-        transition: all 0.18s;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         align-self: flex-start;
+        margin-top: 6px;
+        letter-spacing: -0.1px;
       }
-      .mrd-s1-start-btn:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+      .s1-start-btn:hover {
+        background: rgba(20,20,35,0.98);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 22px rgba(0,0,0,0.28);
+      }
 
-      /* Division selector */
+      /* ── Division screen ── */
       #mrd-s1-division {
         display: none;
         flex-direction: column;
-        gap: 14px;
+        gap: 0;
+        flex: 1;
       }
-      .mrd-s1-divider-label {
-        font-size: 10px;
+
+      /* ASME header strip */
+      .s1-asme-strip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 40px 12px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+        background: rgba(248,249,252,0.6);
+      }
+      .s1-asme-label {
+        font-size: 10.5px;
         font-weight: 700;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
         color: rgba(20,20,35,0.35);
         text-transform: uppercase;
-        border-bottom: 1px solid rgba(0,0,0,0.08);
-        padding-bottom: 8px;
-        margin-bottom: 2px;
       }
-      .mrd-div-row {
+      .s1-div-pills {
         display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+        gap: 8px;
       }
-      .mrd-div-btn {
-        padding: 10px 22px;
+      .s1-div-pill {
+        padding: 6px 18px;
         border-radius: 22px;
-        border: 1.5px solid rgba(37,99,235,0.35);
-        background: rgba(37,99,235,0.06);
-        color: rgba(37,99,235,0.85);
-        font-size: 13px;
-        font-weight: 700;
+        border: 1px solid rgba(0,0,0,0.13);
+        background: rgba(255,255,255,0.8);
+        color: rgba(20,20,35,0.55);
+        font-size: 12px;
+        font-weight: 600;
         cursor: pointer;
         font-family: inherit;
-        transition: all 0.18s;
+        transition: all 0.15s;
+        letter-spacing: -0.1px;
       }
-      .mrd-div-btn:hover { background: rgba(37,99,235,0.14); }
-      .mrd-div-btn.active { background: #2563EB; color: #fff; border-color: #2563EB; }
-      .mrd-div-btn.coming-soon { border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.04); cursor: default; }
+      .s1-div-pill:hover:not(.s1-cs) { background: rgba(20,20,35,0.06); color: rgba(20,20,35,0.80); }
+      .s1-div-pill.s1-active { background: rgba(20,20,35,0.88); color: #fff; border-color: transparent; }
+      .s1-div-pill.s1-cs { color: rgba(20,20,35,0.25); background: rgba(0,0,0,0.03); cursor: default; }
 
-      /* Vessel config form */
+      /* ── Config panel (inputs + tree) ── */
       #mrd-s1-config {
         display: none;
         flex-direction: column;
-        gap: 18px;
+        flex: 1;
+        overflow: hidden;
       }
 
-      .mrd-s1-input-row {
+      /* Input row */
+      .s1-input-row {
         display: flex;
         gap: 14px;
-        flex-wrap: wrap;
+        padding: 16px 40px 14px;
+        border-bottom: 1px solid rgba(0,0,0,0.055);
+        flex-shrink: 0;
       }
-      .mrd-s1-field {
+      .s1-field {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 5px;
-        flex: 1;
-        min-width: 160px;
+        gap: 4px;
       }
-      .mrd-s1-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: rgba(20,20,35,0.45);
-        letter-spacing: 0.3px;
+      .s1-lbl {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: rgba(20,20,35,0.38);
+        text-transform: uppercase;
       }
-      .mrd-s1-input {
-        width: 100%;
+      .s1-inp {
         background: rgba(255,255,255,0.75);
-        border: 1px solid rgba(0,0,0,0.12);
+        border: 1px solid rgba(0,0,0,0.11);
         border-radius: 9px;
         color: rgba(20,20,35,0.85);
         font-size: 13px;
-        padding: 9px 12px;
+        padding: 8px 11px;
         outline: none;
         font-family: inherit;
-        transition: border-color 0.2s, box-shadow 0.2s;
+        transition: border-color 0.18s, box-shadow 0.18s;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05) inset;
+        width: 100%;
         box-sizing: border-box;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06) inset;
       }
-      .mrd-s1-input:focus { border-color: rgba(37,99,235,0.5); background: rgba(255,255,255,0.95); box-shadow: 0 0 0 3px rgba(37,99,235,0.10); }
-      .mrd-s1-input-error { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important; }
-      .mrd-s1-error-msg { font-size: 11px; color: #ef4444; margin-top: 2px; display: none; }
+      .s1-inp:focus {
+        border-color: rgba(0,0,0,0.28);
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.07);
+      }
+      .s1-inp.s1-err { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+      .s1-err-msg { font-size: 10.5px; color: #ef4444; display: none; margin-top: 1px; }
 
-      /* Hierarchy */
-      .mrd-s1-hier-section {
-        background: rgba(255,255,255,0.6);
-        border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 12px;
-        overflow: hidden;
+      /* ── MIRO TREE inside card ── */
+      .s1-tree-area {
+        flex: 1;
+        position: relative;
+        overflow: auto;
+        padding: 20px 32px 20px 40px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0,0,0,0.12) transparent;
       }
-      .mrd-s1-hier-row {
+      .s1-tree-area::-webkit-scrollbar { width: 4px; height: 4px; }
+      .s1-tree-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+      /* SVG connector lines */
+      #s1-svg-lines {
+        position: absolute;
+        top: 0; left: 0;
+        pointer-events: none;
+        overflow: visible;
+        z-index: 0;
+      }
+      .s1-conn {
+        fill: none;
+        stroke: rgba(0,0,0,0.10);
+        stroke-width: 1.5;
+      }
+
+      /* Tree flex layout */
+      .s1-tree-cols {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0;
+        position: relative;
+        z-index: 1;
+        min-height: 100%;
+      }
+
+      .s1-col {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-shrink: 0;
+        padding-right: 44px;
+        position: relative;
+      }
+
+      /* ── Apple-style node cards ── */
+      .s1-node {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
+        gap: 9px;
+        padding: 8px 14px;
+        border-radius: 10px;
         cursor: pointer;
         user-select: none;
-        transition: background 0.15s;
+        position: relative;
+        white-space: nowrap;
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 500;
+        letter-spacing: -0.1px;
+        /* NO transition on transform/background to eliminate blink */
+        border: 1px solid transparent;
       }
-      .mrd-s1-hier-row:hover { background: rgba(0,0,0,0.03); }
-      .mrd-s1-hier-row.fixed-row { cursor: default; }
-      .mrd-s1-hier-row.fixed-row:hover { background: none; }
+      /* Only transition on hover-out, not hover-in, to reduce flash */
+      .s1-node:hover { border-color: rgba(0,0,0,0.10); background: rgba(0,0,0,0.04); }
 
-      .mrd-s1-checkbox {
-        width: 18px; height: 18px;
-        border-radius: 5px;
-        border: 1.5px solid rgba(37,99,235,0.4);
-        background: rgba(255,255,255,0.8);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-        transition: all 0.15s;
-        cursor: pointer;
-      }
-      .mrd-s1-checkbox.checked {
-        background: #2563EB;
-        border-color: #2563EB;
-      }
-      .mrd-s1-checkbox.checked::after {
-        content: '';
-        width: 10px; height: 6px;
-        border-left: 2px solid #fff;
-        border-bottom: 2px solid #fff;
-        transform: rotate(-45deg) translate(1px, -1px);
-        display: block;
-      }
-      .mrd-s1-checkbox.fixed {
-        background: #2563EB;
-        border-color: #2563EB;
+      /* Root node */
+      .s1-node-root {
+        background: rgba(20,20,35,0.88);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 11px 20px;
+        border-radius: 12px;
         cursor: default;
-        opacity: 0.7;
+        letter-spacing: -0.2px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.20);
+        border-color: transparent !important;
       }
-      .mrd-s1-checkbox.fixed::after {
-        content: '🔒';
-        font-size: 9px;
+      .s1-node-root:hover { background: rgba(20,20,35,0.88); }
+
+      /* L1 — main section nodes */
+      .s1-node-l1 {
+        background: rgba(255,255,255,0.85);
+        color: rgba(20,20,35,0.78);
+        border-color: rgba(0,0,0,0.09);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        min-width: 148px;
+        font-weight: 600;
+      }
+      .s1-node-l1.s1-open {
+        background: rgba(20,20,35,0.06);
+        border-color: rgba(0,0,0,0.14);
+        color: rgba(20,20,35,0.88);
+      }
+      .s1-node-l1.s1-fixed { cursor: default; }
+      .s1-node-l1.s1-fixed:hover { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.09); }
+
+      /* L2 — sub-option nodes */
+      .s1-node-l2 {
+        background: rgba(255,255,255,0.78);
+        color: rgba(20,20,35,0.65);
+        border-color: rgba(0,0,0,0.07);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        min-width: 142px;
+        font-weight: 500;
+        font-size: 12px;
+      }
+      .s1-node-l2.s1-sel {
+        background: rgba(0,0,0,0.06);
+        border-color: rgba(0,0,0,0.16);
+        color: rgba(20,20,35,0.85);
+        font-weight: 600;
+      }
+      .s1-node-l2.s1-open {
+        background: rgba(0,0,0,0.05);
+        border-color: rgba(0,0,0,0.13);
+        color: rgba(20,20,35,0.82);
+      }
+      .s1-node-l2.s1-blocked { opacity: 0.32; pointer-events: none; }
+
+      /* L3 — leaf nodes */
+      .s1-node-l3 {
+        background: rgba(255,255,255,0.70);
+        color: rgba(20,20,35,0.60);
+        border-color: rgba(0,0,0,0.06);
+        min-width: 134px;
+        font-size: 11.5px;
+        font-weight: 400;
+        padding: 7px 12px;
+        border-radius: 8px;
+      }
+      .s1-node-l3.s1-sel {
+        background: rgba(0,0,0,0.05);
+        border-color: rgba(0,0,0,0.14);
+        color: rgba(20,20,35,0.82);
+        font-weight: 500;
+      }
+      .s1-node-l3.s1-blocked { opacity: 0.28; pointer-events: none; }
+
+      /* Checkmark icon (Apple SF symbol style) */
+      .s1-chk {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(0,0,0,0.18);
+        background: rgba(255,255,255,0.7);
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%; height: 100%;
-        transform: none;
-        border: none;
+        transition: background 0.15s, border-color 0.15s;
+        position: relative;
       }
-      .mrd-s1-checkbox.disabled {
-        opacity: 0.3;
-        pointer-events: none;
+      .s1-node.s1-sel .s1-chk,
+      .s1-node.s1-open .s1-chk {
+        background: rgba(20,20,35,0.85);
+        border-color: transparent;
+      }
+      .s1-node.s1-sel .s1-chk::after {
+        content: '';
+        width: 8px; height: 5px;
+        border-left: 1.5px solid #fff;
+        border-bottom: 1.5px solid #fff;
+        transform: rotate(-45deg) translate(0.5px, -0.5px);
+        display: block;
+      }
+      .s1-node.s1-open .s1-chk::after {
+        content: '';
+        width: 6px; height: 6px;
+        background: #fff;
+        border-radius: 50%;
+        transform: none;
+        display: block;
+      }
+      .s1-node-root .s1-chk { display: none; }
+      .s1-node-l1.s1-fixed .s1-chk {
+        background: rgba(0,0,0,0.08);
+        border-color: rgba(0,0,0,0.10);
+      }
+      .s1-node-l1.s1-fixed .s1-chk::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 12'%3E%3Cpath d='M5 0C3.34 0 2 1.34 2 3v1H1a1 1 0 00-1 1v6a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H8V3C8 1.34 6.66 0 5 0zm0 1.5c.97 0 1.75.78 1.75 1.75V4h-3.5V3.25C3.25 2.28 4.03 1.5 5 1.5zM5 7a1.25 1.25 0 110 2.5A1.25 1.25 0 015 7z' fill='rgba(0,0,0,0.35)'/%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        border-radius: 0;
+        display: block;
+        width: 8px; height: 8px;
+        transform: none;
+      }
+      .s1-node-l1.s1-fixed .s1-chk::after { content: none; }
+      .s1-fixed-dot {
+        width: 5px; height: 5px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.28);
+        display: block;
       }
 
-      .mrd-s1-row-label {
-        font-size: 13px;
-        font-weight: 500;
-        color: rgba(20,20,35,0.80);
-        flex: 1;
-      }
-      .mrd-s1-row-label.fixed-label {
-        font-weight: 700;
-        color: rgba(20,20,35,0.88);
-      }
-      .mrd-s1-chevron {
+      /* Node label */
+      .s1-nlbl { flex: 1; }
+
+      /* Chevron */
+      .s1-chev {
         font-size: 11px;
-        color: rgba(20,20,35,0.35);
-        transition: transform 0.2s;
+        color: rgba(0,0,0,0.28);
+        margin-left: 2px;
+        transition: transform 0.18s;
         flex-shrink: 0;
       }
-      .mrd-s1-chevron.open { transform: rotate(90deg); }
+      .s1-node.s1-open .s1-chev { transform: rotate(90deg); color: rgba(0,0,0,0.45); }
 
-      .mrd-s1-children {
+      /* Section label above column */
+      .s1-col-label {
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        color: rgba(20,20,35,0.30);
+        margin-bottom: 4px;
+        padding-left: 2px;
+      }
+
+      /* ── Proceed button row ── */
+      .s1-bottom-bar {
         display: none;
-        background: rgba(0,0,0,0.02);
-        border-top: 1px solid rgba(0,0,0,0.05);
-      }
-      .mrd-s1-children.open { display: block; }
-
-      .mrd-s1-child-row {
-        display: flex;
+        padding: 14px 40px;
+        border-top: 1px solid rgba(0,0,0,0.055);
+        flex-shrink: 0;
         align-items: center;
-        gap: 10px;
-        padding: 8px 14px 8px 36px;
-        cursor: pointer;
-        user-select: none;
-        transition: background 0.15s;
+        justify-content: flex-end;
+        background: rgba(248,249,252,0.5);
       }
-      .mrd-s1-child-row:hover { background: rgba(0,0,0,0.03); }
-      .mrd-s1-child-row.disabled-row {
-        opacity: 0.38;
-        pointer-events: none;
-      }
-
-      .mrd-s1-grandchild-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 7px 14px 7px 58px;
-        cursor: pointer;
-        user-select: none;
-        transition: background 0.15s;
-      }
-      .mrd-s1-grandchild-row:hover { background: rgba(0,0,0,0.03); }
-
-      .mrd-s1-child-label {
-        font-size: 12.5px;
-        color: rgba(20,20,35,0.75);
-        flex: 1;
-      }
-
-      /* Proceed button */
-      .mrd-s1-proceed-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #16a34a;
+      .s1-bottom-bar.visible { display: flex; }
+      .s1-proceed-btn {
+        background: rgba(20,20,35,0.88);
         color: #fff;
         border: none;
         border-radius: 22px;
-        padding: 14px 32px;
-        font-size: 15px;
-        font-weight: 700;
+        padding: 11px 26px;
+        font-size: 13.5px;
+        font-weight: 600;
         cursor: pointer;
         font-family: inherit;
-        box-shadow: 0 4px 16px rgba(22,163,74,0.3);
-        transition: all 0.18s;
-        align-self: flex-start;
-        margin-top: 8px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+        transition: background 0.18s, transform 0.14s, box-shadow 0.18s;
+        letter-spacing: -0.1px;
       }
-      .mrd-s1-proceed-btn:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(22,163,74,0.4); }
+      .s1-proceed-btn:hover {
+        background: rgba(20,20,35,1);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+      }
 
-      /* Toast */
+      /* ── Toast ── */
       #mrd-s1-toast {
         position: fixed;
-        bottom: 30px;
+        bottom: 28px;
         left: 50%;
-        transform: translateX(-50%) translateY(80px);
-        background: rgba(28,28,30,0.92);
+        transform: translateX(-50%) translateY(70px);
+        background: rgba(20,20,30,0.92);
         color: #fff;
-        padding: 10px 22px;
+        padding: 9px 20px;
         border-radius: 22px;
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 600;
         z-index: 9000;
-        transition: transform 0.3s ease, opacity 0.3s ease;
+        transition: transform 0.28s ease, opacity 0.28s ease;
         opacity: 0;
         pointer-events: none;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
       }
-      #mrd-s1-toast.show {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-      }
+      #mrd-s1-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-      /* Back button in Step 2 */
+      /* ── Back button ── */
       #mrd-back-to-step1 {
         position: fixed;
         top: 10px;
@@ -411,14 +532,23 @@
         border-radius: 22px;
         padding: 7px 16px;
         font-size: 12px;
-        font-weight: 700;
-        color: rgba(20,20,35,0.75);
+        font-weight: 600;
+        color: rgba(20,20,35,0.70);
         cursor: pointer;
         font-family: inherit;
         transition: all 0.18s;
         display: none;
+        letter-spacing: -0.1px;
       }
       #mrd-back-to-step1:hover { background: rgba(255,255,255,0.95); color: rgba(20,20,35,0.95); }
+
+      @media (max-width: 768px) {
+        #mrd-step1-card { flex-direction: column; }
+        #mrd-s1-left { width: 100%; min-height: 200px; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .s1-input-row { padding: 14px 20px; }
+        .s1-tree-area { padding: 16px 20px; }
+        #mrd-s1-opening { padding: 32px 24px; }
+      }
     </style>
 </head>
 <body>
@@ -886,281 +1016,162 @@
     <!-- ─────────────────────────────────────────────────────────
          MAIN UI (3 blocks)
     ─────────────────────────────────────────────────────────── -->
-    <!-- ── Toast notification ── -->
-    <div id="mrd-s1-toast">Coming Soon</div>
-
-    <!-- ── Back to Step 1 button (shown in Step 2) ── -->
+    <div id="mrd-s1-toast"></div>
     <button id="mrd-back-to-step1" onclick="mrdGoToStep1()">← Edit Vessel</button>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         STEP 1 — VESSEL BUILDER PANEL
-    ═══════════════════════════════════════════════════════════════ -->
+    <!-- STEP 1 PANEL -->
     <div id="mrd-step1">
       <div id="mrd-step1-card">
 
-        <!-- LEFT: Vessel Illustration -->
+        <!-- LEFT: 3D Vessel illustration -->
         <div id="mrd-s1-left">
-          <svg viewBox="0 0 160 440" xmlns="http://www.w3.org/2000/svg" width="140" height="360" style="filter:drop-shadow(0 6px 18px rgba(0,0,0,0.18))">
-            <!-- Vessel body group -->
+          <svg viewBox="0 0 120 360" xmlns="http://www.w3.org/2000/svg" width="130" height="320">
             <defs>
-              <linearGradient id="vesGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#c8cdd6;stop-opacity:1"/>
-                <stop offset="35%" style="stop-color:#f0f2f5;stop-opacity:1"/>
-                <stop offset="65%" style="stop-color:#e2e6ec;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#b0b5be;stop-opacity:1"/>
+              <radialGradient id="vbg" cx="32%" cy="35%" r="68%">
+                <stop offset="0%" stop-color="#f6f8fc"/>
+                <stop offset="42%" stop-color="#dde3ef"/>
+                <stop offset="100%" stop-color="#b2bbcc"/>
+              </radialGradient>
+              <radialGradient id="vhd" cx="50%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#eaecf5"/>
+                <stop offset="100%" stop-color="#aab3c8"/>
+              </radialGradient>
+              <radialGradient id="vsk" cx="42%" cy="42%" r="62%">
+                <stop offset="0%" stop-color="#d2d9e8"/>
+                <stop offset="100%" stop-color="#9aa5bc"/>
+              </radialGradient>
+              <linearGradient id="vsh" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="rgba(255,255,255,0)"/>
+                <stop offset="28%"  stop-color="rgba(255,255,255,0.30)"/>
+                <stop offset="52%"  stop-color="rgba(255,255,255,0.10)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
               </linearGradient>
-              <linearGradient id="headGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#d8dce4;stop-opacity:1"/>
-                <stop offset="50%" style="stop-color:#f4f6f9;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#b8bcc5;stop-opacity:1"/>
-              </linearGradient>
-              <linearGradient id="skirtGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#a8adb8;stop-opacity:1"/>
-                <stop offset="40%" style="stop-color:#d4d8e2;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#9ea3ae;stop-opacity:1"/>
-              </linearGradient>
-              <linearGradient id="nozzleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#b0b5be;stop-opacity:1"/>
-                <stop offset="50%" style="stop-color:#dde0e8;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#a8adb8;stop-opacity:1"/>
+              <linearGradient id="vnz" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#c2c8d6"/>
+                <stop offset="50%"  stop-color="#e0e5ee"/>
+                <stop offset="100%" stop-color="#b8bfce"/>
               </linearGradient>
             </defs>
 
-            <!-- Skirt base plate -->
-            <rect x="42" y="402" width="76" height="8" rx="2" fill="url(#skirtGrad)" stroke="#8a8f9a" stroke-width="0.8"/>
+            <!-- Baseplate -->
+            <rect x="33" y="310" width="54" height="8" rx="2" fill="url(#vsk)" stroke="#8a93a6" stroke-width="0.6"/>
+            <ellipse cx="60" cy="310" rx="27" ry="5" fill="#a4abbe" opacity="0.6"/>
+
             <!-- Skirt cylinder -->
-            <rect x="54" y="342" width="52" height="62" rx="0" fill="url(#skirtGrad)" stroke="#8a8f9a" stroke-width="0.8"/>
-            <!-- Skirt access hole -->
-            <ellipse cx="80" cy="373" rx="9" ry="11" fill="#c5c9d2" stroke="#8a8f9a" stroke-width="0.7"/>
+            <rect x="38" y="262" width="44" height="50" fill="url(#vsk)" stroke="#8a93a6" stroke-width="0.7"/>
+            <!-- Skirt top ellipse -->
+            <ellipse cx="60" cy="262" rx="22" ry="5.5" fill="#b8bfcf" opacity="0.55"/>
+            <!-- Access hole -->
+            <ellipse cx="60" cy="287" rx="8" ry="10" fill="#9aa5bc" opacity="0.45"/>
+            <ellipse cx="60" cy="287" rx="5.5" ry="7" fill="#8892a8" opacity="0.38"/>
 
             <!-- Main shell -->
-            <rect x="46" y="112" width="68" height="232" fill="url(#vesGrad)" stroke="#9a9fa8" stroke-width="1"/>
-
-            <!-- Highlight stripe on shell -->
-            <rect x="70" y="112" width="14" height="232" fill="rgba(255,255,255,0.22)" rx="2"/>
+            <rect x="26" y="86" width="68" height="178" fill="url(#vbg)"/>
+            <!-- Shine overlay -->
+            <rect x="26" y="86" width="68" height="178" fill="url(#vsh)"/>
 
             <!-- Bottom dished head -->
-            <ellipse cx="80" cy="344" rx="34" ry="14" fill="url(#headGrad)" stroke="#9a9fa8" stroke-width="1"/>
+            <ellipse cx="60" cy="264" rx="34" ry="12" fill="url(#vhd)" stroke="#a4abbe" stroke-width="0.6"/>
 
-            <!-- Top dished head -->
-            <ellipse cx="80" cy="112" rx="34" ry="14" fill="url(#headGrad)" stroke="#9a9fa8" stroke-width="1"/>
+            <!-- Top dished head (flat ellipse) -->
+            <ellipse cx="60" cy="86" rx="34" ry="12" fill="url(#vhd)" stroke="#a4abbe" stroke-width="0.6"/>
 
-            <!-- Top nozzle (vent/outlet) -->
-            <rect x="74" y="86" width="12" height="26" fill="url(#nozzleGrad)" stroke="#8a8f9a" stroke-width="0.8"/>
-            <ellipse cx="80" cy="86" rx="10" ry="4" fill="#cdd0d8" stroke="#8a8f9a" stroke-width="0.8"/>
-            <!-- Flange rings -->
-            <ellipse cx="80" cy="90" rx="13" ry="4.5" fill="none" stroke="#8a8f9a" stroke-width="1.5"/>
-            <ellipse cx="80" cy="88" rx="13" ry="4.5" fill="none" stroke="#8a8f9a" stroke-width="1.5"/>
+            <!-- Ellipsoidal dome -->
+            <path d="M26,86 Q26,36 60,28 Q94,36 94,86" fill="url(#vhd)" stroke="#a4abbe" stroke-width="0.7"/>
+            <!-- Dome shine -->
+            <path d="M36,68 Q42,44 60,38" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"/>
 
-            <!-- Left nozzle (inlet) -->
-            <rect x="10" y="178" width="36" height="10" fill="url(#nozzleGrad)" stroke="#8a8f9a" stroke-width="0.8"/>
-            <rect x="6" y="175" width="7" height="16" rx="1" fill="#cdd0d8" stroke="#8a8f9a" stroke-width="0.8"/>
-            <rect x="7" y="177" width="5" height="12" rx="0.5" fill="#b8bcc5" stroke="#8a8f9a" stroke-width="0.6"/>
+            <!-- Top nozzle -->
+            <rect x="54" y="12" width="12" height="20" fill="url(#vbg)" stroke="#a0a8b8" stroke-width="0.5"/>
+            <ellipse cx="60" cy="12" rx="9" ry="3.5" fill="#cdd2de"/>
+            <ellipse cx="60" cy="16" rx="12" ry="4.5" fill="none" stroke="#9ea6b6" stroke-width="1.6"/>
+            <ellipse cx="60" cy="13.5" rx="12" ry="4.5" fill="none" stroke="#9ea6b6" stroke-width="1.6"/>
 
-            <!-- Right nozzle (outlet) -->
-            <rect x="114" y="218" width="34" height="10" fill="url(#nozzleGrad)" stroke="#8a8f9a" stroke-width="0.8"/>
-            <rect x="147" y="215" width="7" height="16" rx="1" fill="#cdd0d8" stroke="#8a8f9a" stroke-width="0.8"/>
-            <rect x="148" y="217" width="5" height="12" rx="0.5" fill="#b8bcc5" stroke="#8a8f9a" stroke-width="0.6"/>
+            <!-- Stiffener ring 1 -->
+            <rect x="24" y="148" width="72" height="4.5" rx="1" fill="#b8bfcb" opacity="0.55"/>
+            <!-- Stiffener ring 2 -->
+            <rect x="24" y="210" width="72" height="4.5" rx="1" fill="#b8bfcb" stroke="#a0a8b8" stroke-width="0.3" opacity="0.55"/>
 
-            <!-- Left nozzle 2 (drain) -->
-            <rect x="14" y="295" width="32" height="9" fill="url(#nozzleGrad)" stroke="#8a8f9a" stroke-width="0.8"/>
-            <rect x="10" y="292" width="7" height="15" rx="1" fill="#cdd0d8" stroke="#8a8f9a" stroke-width="0.8"/>
+            <!-- Left nozzle (inlet, large) -->
+            <rect x="2" y="116" width="24" height="10" fill="url(#vnz)" stroke="#9ea6b6" stroke-width="0.5"/>
+            <rect x="2" y="114" width="7" height="14" rx="1.5" fill="#cdd2de" stroke="#9ea6b6" stroke-width="0.6"/>
+
+            <!-- Right nozzle 1 -->
+            <rect x="94" y="170" width="22" height="9" fill="url(#vnz)" stroke="#9ea6b6" stroke-width="0.5"/>
+            <rect x="111" y="168" width="7" height="13" rx="1.5" fill="#cdd2de" stroke="#9ea6b6" stroke-width="0.6"/>
+
+            <!-- Left nozzle 2 (drain, small) -->
+            <rect x="5" y="230" width="21" height="8" fill="url(#vnz)" stroke="#9ea6b6" stroke-width="0.5"/>
+            <rect x="5" y="228" width="6" height="12" rx="1" fill="#cdd2de" stroke="#9ea6b6" stroke-width="0.5"/>
 
             <!-- Right nozzle 2 (instrument) -->
-            <rect x="114" y="155" width="28" height="8" fill="url(#nozzleGrad)" stroke="#8a8f9a" stroke-width="0.8"/>
-            <rect x="142" y="153" width="6" height="12" rx="1" fill="#cdd0d8" stroke="#8a8f9a" stroke-width="0.8"/>
-
-            <!-- Stiffener ring -->
-            <rect x="43" y="198" width="74" height="5" rx="1" fill="#b8bcc5" stroke="#8a8f9a" stroke-width="0.7"/>
-            <rect x="43" y="268" width="74" height="5" rx="1" fill="#b8bcc5" stroke="#8a8f9a" stroke-width="0.7"/>
-
-            <!-- Insulation support rings (subtle) -->
-            <rect x="44" y="145" width="72" height="3" rx="1" fill="rgba(150,155,165,0.4)"/>
-            <rect x="44" y="315" width="72" height="3" rx="1" fill="rgba(150,155,165,0.4)"/>
-
-            <!-- Name plate -->
-            <rect x="82" y="230" width="26" height="14" rx="2" fill="#d0d3db" stroke="#8a8f9a" stroke-width="0.8"/>
-            <text x="95" y="240" font-size="4" fill="#6a6f7a" text-anchor="middle" font-family="sans-serif">MDS</text>
+            <rect x="94" y="100" width="17" height="7" fill="url(#vnz)" stroke="#9ea6b6" stroke-width="0.5"/>
+            <rect x="108" y="99" width="6" height="9" rx="1" fill="#cdd2de" stroke="#9ea6b6" stroke-width="0.5"/>
 
             <!-- Seam lines -->
-            <line x1="46" y1="200" x2="114" y2="200" stroke="#9a9fa8" stroke-width="0.4" stroke-dasharray="3,3" opacity="0.5"/>
-            <line x1="46" y1="270" x2="114" y2="270" stroke="#9a9fa8" stroke-width="0.4" stroke-dasharray="3,3" opacity="0.5"/>
+            <line x1="26" y1="148" x2="94" y2="148" stroke="#9ea6b6" stroke-width="0.4" stroke-dasharray="3,3" opacity="0.5"/>
+            <line x1="26" y1="210" x2="94" y2="210" stroke="#9ea6b6" stroke-width="0.4" stroke-dasharray="3,3" opacity="0.5"/>
+
+            <!-- Nameplate -->
+            <rect x="64" y="186" width="22" height="12" rx="2" fill="#ced3de" stroke="#9ea6b6" stroke-width="0.6"/>
           </svg>
         </div>
 
-        <!-- RIGHT: Builder Content -->
+        <!-- RIGHT: Builder content -->
         <div id="mrd-s1-right">
 
-          <!-- Opening Screen -->
+          <!-- Opening screen -->
           <div id="mrd-s1-opening">
-            <div class="mrd-s1-heading">Build Your Vessel</div>
-            <div class="mrd-s1-sub">Configure your vessel parameters to generate a tailored checklist</div>
-            <button class="mrd-s1-start-btn" onclick="mrdS1ShowDivision()">Start Building &rarr;</button>
+            <div class="s1-heading">Build Your Vessel</div>
+            <div class="s1-sub">Configure your vessel parameters to generate a tailored checklist</div>
+            <button class="s1-start-btn" onclick="s1ShowDivision()">Start Building &rarr;</button>
           </div>
 
-          <!-- Division Selector -->
+          <!-- Division selector (hidden initially) -->
           <div id="mrd-s1-division">
-            <div class="mrd-s1-divider-label">Built using ASME Section VIII</div>
-            <div class="mrd-div-row">
-              <button class="mrd-div-btn active" id="mrd-div1-btn" onclick="mrdS1SelectDivision(1)">Division 1</button>
-              <button class="mrd-div-btn coming-soon" onclick="mrdS1ComingSoon(this)">Division 2</button>
-              <button class="mrd-div-btn coming-soon" onclick="mrdS1ComingSoon(this)">Division 3</button>
+            <div class="s1-asme-strip">
+              <span class="s1-asme-label">Built using ASME Section VIII</span>
+              <div class="s1-div-pills">
+                <button class="s1-div-pill s1-active" id="s1-d1" onclick="s1SelectDiv(1)">Division 1</button>
+                <button class="s1-div-pill s1-cs" onclick="s1ComingSoon(this)">Division 2</button>
+                <button class="s1-div-pill s1-cs" onclick="s1ComingSoon(this)">Division 3</button>
+              </div>
             </div>
 
-            <!-- Vessel Config (shown when Div 1 is selected) -->
+            <!-- Config panel -->
             <div id="mrd-s1-config">
-
-              <!-- Vessel Name + Tag -->
-              <div class="mrd-s1-input-row">
-                <div class="mrd-s1-field">
-                  <label class="mrd-s1-label">Vessel Name</label>
-                  <input class="mrd-s1-input" type="text" id="s1-vessel-name" placeholder="e.g. Knockout Drum" />
-                  <span class="mrd-s1-error-msg" id="s1-err-name">Please enter a vessel name</span>
+              <!-- Inputs -->
+              <div class="s1-input-row">
+                <div class="s1-field">
+                  <label class="s1-lbl">Vessel Name</label>
+                  <input class="s1-inp" type="text" id="s1-vessel-name" placeholder="e.g. Knockout Drum"/>
+                  <span class="s1-err-msg" id="s1-err-name">Please enter a vessel name</span>
                 </div>
-                <div class="mrd-s1-field">
-                  <label class="mrd-s1-label">Equipment Tag Number</label>
-                  <input class="mrd-s1-input" type="text" id="s1-equip-tag" placeholder="e.g. V-1001" />
-                  <span class="mrd-s1-error-msg" id="s1-err-tag">Please enter an equipment tag</span>
+                <div class="s1-field">
+                  <label class="s1-lbl">Equipment Tag</label>
+                  <input class="s1-inp" type="text" id="s1-equip-tag" placeholder="e.g. V-1001"/>
+                  <span class="s1-err-msg" id="s1-err-tag">Please enter an equipment tag</span>
                 </div>
               </div>
 
-              <!-- Hierarchy header -->
-              <div class="mrd-s1-divider-label" style="margin-top:4px;">Vessel Configuration</div>
-
-              <!-- 1. Vertical Vessel (fixed header) -->
-              <div class="mrd-s1-hier-section">
-                <div class="mrd-s1-hier-row fixed-row" onclick="mrdS1ToggleAll()">
-                  <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                  <span class="mrd-s1-row-label fixed-label">1. Vertical Vessel</span>
-                  <span class="mrd-s1-chevron open" id="s1-chev-vessel">&#8250;</span>
+              <!-- MIRO Tree area -->
+              <div class="s1-tree-area" id="s1-tree-area">
+                <svg id="s1-svg-lines" width="2000" height="2000"></svg>
+                <div class="s1-tree-cols" id="s1-tree-cols">
+                  <!-- injected by JS -->
                 </div>
-                <div class="mrd-s1-children open" id="s1-vessel-children">
+              </div>
 
-                  <!-- 1.1 Design Condition -->
-                  <div class="mrd-s1-child-row fixed-row" onclick="mrdS1ToggleSection('s1-dc')">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.1 Design Condition</span>
-                    <span class="mrd-s1-chevron open" id="s1-chev-dc" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-                  </div>
-                  <div id="s1-dc" style="display:block; background:rgba(0,0,0,0.015); padding-left:22px;">
-                    <!-- 1.1.1 Material sub-section (fixed) -->
-                    <div class="mrd-s1-child-row fixed-row" onclick="mrdS1ToggleSection('s1-mat-parts')">
-                      <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                      <span class="mrd-s1-child-label" style="font-weight:600;">1.1.1 Material</span>
-                      <span class="mrd-s1-chevron open" id="s1-chev-mat-parts" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-                    </div>
-                    <div id="s1-mat-parts" style="display:block; padding-left:22px;">
-                      <!-- Material parts checkboxes -->
-                      <div id="s1-mat-list"></div>
-                    </div>
-                  </div>
+              <!-- Bottom proceed bar -->
+              <div class="s1-bottom-bar" id="s1-bottom-bar">
+                <button class="s1-proceed-btn" onclick="mrdS1Proceed()">Proceed to Checklist &rarr;</button>
+              </div>
+            </div>
+          </div>
 
-                  <!-- 1.2 Internals -->
-                  <div class="mrd-s1-child-row fixed-row" onclick="mrdS1ToggleSection('s1-internals')">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.2 Internals</span>
-                    <span class="mrd-s1-chevron open" id="s1-chev-internals" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-                  </div>
-                  <div id="s1-internals" style="display:block; padding-left:22px;">
-                    <div id="s1-internals-list"></div>
-                  </div>
-
-                  <!-- 1.3 Nozzles (fixed, no children) -->
-                  <div class="mrd-s1-child-row fixed-row">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.3 Nozzles</span>
-                  </div>
-
-                  <!-- 1.4 Mixers (fixed, no children) -->
-                  <div class="mrd-s1-child-row fixed-row">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.4 Mixers</span>
-                  </div>
-
-                  <!-- 1.5 Mounted Equipment -->
-                  <div class="mrd-s1-child-row fixed-row" onclick="mrdS1ToggleSection('s1-mounted')">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.5 Mounted Equipment</span>
-                    <span class="mrd-s1-chevron open" id="s1-chev-mounted" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-                  </div>
-                  <div id="s1-mounted" style="display:block; padding-left:22px;" id="s1-mounted-list">
-                    <div class="mrd-s1-grandchild-row" onclick="mrdS1Toggle('1.5.1',this)" data-id="1.5.1">
-                      <div class="mrd-s1-checkbox" id="cb-1.5.1"></div>
-                      <span class="mrd-s1-child-label">1.5.1 Heat Exchanger</span>
-                    </div>
-                    <div class="mrd-s1-grandchild-row" onclick="mrdS1Toggle('1.5.2',this)" data-id="1.5.2">
-                      <div class="mrd-s1-checkbox" id="cb-1.5.2"></div>
-                      <span class="mrd-s1-child-label">1.5.2 Vessel with Intermediate Skirt</span>
-                    </div>
-                  </div>
-
-                  <!-- 1.6 Platforms -->
-                  <div class="mrd-s1-child-row fixed-row" onclick="mrdS1ToggleSection('s1-platforms')">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.6 Platforms</span>
-                    <span class="mrd-s1-chevron open" id="s1-chev-platforms" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-                  </div>
-                  <div id="s1-platforms" style="display:block; padding-left:22px;">
-                    <div class="mrd-s1-grandchild-row" onclick="mrdS1Toggle('1.6.1',this)" data-id="1.6.1" id="row-1.6.1">
-                      <div class="mrd-s1-checkbox" id="cb-1.6.1"></div>
-                      <span class="mrd-s1-child-label">1.6.1 Top Platform</span>
-                    </div>
-                    <div class="mrd-s1-grandchild-row" onclick="mrdS1Toggle('1.6.2',this)" data-id="1.6.2" id="row-1.6.2">
-                      <div class="mrd-s1-checkbox" id="cb-1.6.2"></div>
-                      <span class="mrd-s1-child-label">1.6.2 Circular Platform</span>
-                    </div>
-                    <div class="mrd-s1-grandchild-row" onclick="mrdS1Toggle('1.6.3',this)" data-id="1.6.3" id="row-1.6.3">
-                      <div class="mrd-s1-checkbox" id="cb-1.6.3"></div>
-                      <span class="mrd-s1-child-label">1.6.3 No Platform</span>
-                    </div>
-                  </div>
-
-                  <!-- 1.7 Support (fixed, no children) -->
-                  <div class="mrd-s1-child-row fixed-row">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.7 Support</span>
-                  </div>
-
-                  <!-- 1.8 Transportation (fixed, no children) -->
-                  <div class="mrd-s1-child-row fixed-row">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.8 Transportation</span>
-                  </div>
-
-                  <!-- 1.9 External Attachment -->
-                  <div class="mrd-s1-child-row fixed-row" onclick="mrdS1ToggleSection('s1-extatt')">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.9 External Attachment</span>
-                    <span class="mrd-s1-chevron open" id="s1-chev-extatt" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-                  </div>
-                  <div id="s1-extatt" style="display:block; padding-left:22px;">
-                    <div id="s1-extatt-list"></div>
-                  </div>
-
-                  <!-- 1.10 Internal Head (fixed, no children) -->
-                  <div class="mrd-s1-child-row fixed-row">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.10 Internal Head</span>
-                  </div>
-
-                  <!-- 1.11 Material (fixed, no children) -->
-                  <div class="mrd-s1-child-row fixed-row">
-                    <div class="mrd-s1-checkbox fixed" style="font-size:10px;">&#128274;</div>
-                    <span class="mrd-s1-child-label" style="font-weight:600;">1.11 Material</span>
-                  </div>
-
-                </div><!-- end vessel-children -->
-              </div><!-- end hier-section -->
-
-              <!-- Proceed button -->
-              <button class="mrd-s1-proceed-btn" onclick="mrdS1Proceed()">Proceed to Checklist &rarr;</button>
-
-            </div><!-- end s1-config -->
-          </div><!-- end s1-division -->
-
-        </div><!-- end s1-right -->
-      </div><!-- end step1-card -->
-    </div><!-- end step1 -->
+        </div>
+      </div>
+    </div>
 
     <div id="meridian-ui" style="display:none;">
       <div id="mrd-top-row">
@@ -1835,411 +1846,338 @@
     }
 
     // ═══════════════════════════════════════════════════════
-    //  STEP 1 — VESSEL BUILDER LOGIC
+    //  STEP 1 — VESSEL BUILDER
     // ═══════════════════════════════════════════════════════
 
-    // Global vessel config
-    window.vesselConfig = {
-      vesselName: '',
-      equipmentTag: '',
-      division: 'Division 1',
-      selections: []
-    };
-
-    // ── Material parts (1.1.1.x) ────────────────────────────
-    const S1_MAT_PARTS = [
-      {id:'1.1.1.1',  label:'Shell / Cone'},
-      {id:'1.1.1.2',  label:'Heads'},
-      {id:'1.1.1.3',  label:'Internal Cladding'},
-      {id:'1.1.1.4',  label:'Nozzle Neck – Pipe'},
-      {id:'1.1.1.5',  label:'Nozzle Neck – Plate'},
-      {id:'1.1.1.6',  label:'Nozzle Neck – Forging'},
-      {id:'1.1.1.7',  label:'Reinforcing Plates'},
-      {id:'1.1.1.8',  label:'Nozzle Flanges / Body Flanges'},
-      {id:'1.1.1.9',  label:'Blind Flanges'},
-      {id:'1.1.1.10', label:'Bolting / Nuts – External'},
-      {id:'1.1.1.11', label:'Gaskets – External'},
-      {id:'1.1.1.12', label:'Name Plate'},
-      {id:'1.1.1.13', label:'Internals – Welded (Direct)'},
-      {id:'1.1.1.14', label:'Internals – Removables'},
-      {id:'1.1.1.15', label:'External Welded Attachments'},
-      {id:'1.1.1.16', label:'Bolting / Nuts – Internal'},
-      {id:'1.1.1.17', label:'Support', children:[
-        {id:'1.1.1.17.1', label:'Skirt'},
-        {id:'1.1.1.17.2', label:'Saddle / Wrapper Plate'},
-        {id:'1.1.1.17.3', label:'Legs'},
-        {id:'1.1.1.17.4', label:'Others'},
-      ]},
-      {id:'1.1.1.18', label:'Anchor Bolts'},
-    ];
-
-    // ── Internals (1.2.x) ───────────────────────────────────
-    const S1_REMOVABLE_INT = [
-      {id:'1.2.1.1',  label:'Demister'},
-      {id:'1.2.1.2',  label:'Steam Separator'},
-      {id:'1.2.1.3',  label:'Distributor'},
-      {id:'1.2.1.4',  label:'Inlet Basket'},
-      {id:'1.2.1.5',  label:'Outlet Basket'},
-      {id:'1.2.1.6',  label:'Catalyst Tray / Strainer'},
-      {id:'1.2.1.7',  label:'Grids for Packing'},
-      {id:'1.2.1.8',  label:'Internal Dip Pipe'},
-      {id:'1.2.1.9',  label:'Electrical Vaporizer'},
-      {id:'1.2.1.10', label:'Internal Steam Tracing'},
-      {id:'1.2.1.11', label:'Trays'},
-    ];
-    const S1_WELDED_INT = [
-      {id:'1.2.2.1', label:'Baffles'},
-      {id:'1.2.2.2', label:'Vortex Breaker'},
-      {id:'1.2.2.3', label:'Internal Dip Pipe'},
-      {id:'1.2.2.4', label:'Distributor'},
-      {id:'1.2.2.5', label:'Trays'},
-    ];
-
-    // ── External Attachment (1.9.x) ─────────────────────────
-    const S1_EXT_ATT = [
-      {id:'1.9.1', label:'Piping Clips'},
-      {id:'1.9.2', label:'Insulation Supports'},
-      {id:'1.9.3', label:'Nameplate'},
-      {id:'1.9.4', label:'External Stiffener'},
-      {id:'1.9.5', label:'Ladder Clip'},
-      {id:'1.9.6', label:'External Coil'},
-      {id:'1.9.7', label:'Lifting Element', children:[
-        {id:'1.9.7.1', label:'Lifting Lugs'},
-        {id:'1.9.7.2', label:'Tailing Lugs'},
-        {id:'1.9.7.3', label:'Trunnions'},
-      ]},
-    ];
-
-    // ── State for selections ─────────────────────────────────
+    window.vesselConfig = { vesselName:'', equipmentTag:'', division:'Division 1', selections:[] };
     const s1Sel = new Set();
+    let s1OpenL1 = null;
+    let s1OpenL2 = null;
+    let s1OpenL3 = null; // for 4th column (grandchildren)
 
-    // ── Build dynamic lists ──────────────────────────────────
-    function s1BuildLists() {
-      // Material parts
-      const matEl = document.getElementById('s1-mat-list');
-      if (matEl) matEl.innerHTML = S1_MAT_PARTS.map(p => s1RowHtml(p, 'mrd-s1-grandchild-row', '')).join('');
+    // ── Tree data definition ─────────────────────────────────
+    const S1_TREE_L1 = [
+      { id:'1.1',  label:'Design Condition', fixed:true,  children:[
+        { id:'1.1.1', label:'Material', fixed:true, children:[
+          {id:'1.1.1.1',label:'Shell / Cone'},{id:'1.1.1.2',label:'Heads'},
+          {id:'1.1.1.3',label:'Internal Cladding'},{id:'1.1.1.4',label:'Nozzle Neck – Pipe'},
+          {id:'1.1.1.5',label:'Nozzle Neck – Plate'},{id:'1.1.1.6',label:'Nozzle Neck – Forging'},
+          {id:'1.1.1.7',label:'Reinforcing Plates'},{id:'1.1.1.8',label:'Nozzle / Body Flanges'},
+          {id:'1.1.1.9',label:'Blind Flanges'},{id:'1.1.1.10',label:'Bolting / Nuts – Ext.'},
+          {id:'1.1.1.11',label:'Gaskets – External'},{id:'1.1.1.12',label:'Name Plate'},
+          {id:'1.1.1.13',label:'Internals – Welded'},{id:'1.1.1.14',label:'Internals – Removables'},
+          {id:'1.1.1.15',label:'Ext. Welded Attach.'},{id:'1.1.1.16',label:'Bolting / Nuts – Int.'},
+          {id:'1.1.1.17',label:'Support', hasChildren:true, children:[
+            {id:'1.1.1.17.1',label:'Skirt'},{id:'1.1.1.17.2',label:'Saddle / Wrapper'},
+            {id:'1.1.1.17.3',label:'Legs'},{id:'1.1.1.17.4',label:'Others'},
+          ]},
+          {id:'1.1.1.18',label:'Anchor Bolts'},
+        ]}
+      ]},
+      { id:'1.2',  label:'Internals', fixed:true, children:[
+        { id:'1.2.1', label:'Removable Internal', exclusive:'1.2.3', children:[
+          {id:'1.2.1.1',label:'Demister'},{id:'1.2.1.2',label:'Steam Separator'},
+          {id:'1.2.1.3',label:'Distributor'},{id:'1.2.1.4',label:'Inlet Basket'},
+          {id:'1.2.1.5',label:'Outlet Basket'},{id:'1.2.1.6',label:'Catalyst Tray'},
+          {id:'1.2.1.7',label:'Grids for Packing'},{id:'1.2.1.8',label:'Internal Dip Pipe'},
+          {id:'1.2.1.9',label:'Electrical Vaporizer'},{id:'1.2.1.10',label:'Steam Tracing'},
+          {id:'1.2.1.11',label:'Trays'},
+        ]},
+        { id:'1.2.2', label:'Welded Internal', exclusive:'1.2.3', children:[
+          {id:'1.2.2.1',label:'Baffles'},{id:'1.2.2.2',label:'Vortex Breaker'},
+          {id:'1.2.2.3',label:'Internal Dip Pipe'},{id:'1.2.2.4',label:'Distributor'},
+          {id:'1.2.2.5',label:'Trays'},
+        ]},
+        { id:'1.2.3', label:'No Internal', blocker:true },
+      ]},
+      { id:'1.3',  label:'Nozzles',        fixed:true  },
+      { id:'1.4',  label:'Mixers',         fixed:true  },
+      { id:'1.5',  label:'Mounted Equip.', fixed:true, children:[
+        {id:'1.5.1',label:'Heat Exchanger'},
+        {id:'1.5.2',label:'Vessel w/ Int. Skirt'},
+      ]},
+      { id:'1.6',  label:'Platforms', fixed:true, children:[
+        {id:'1.6.1',label:'Top Platform',      exclusive:'1.6.3'},
+        {id:'1.6.2',label:'Circular Platform', exclusive:'1.6.3'},
+        {id:'1.6.3',label:'No Platform', blocker:true},
+      ]},
+      { id:'1.7',  label:'Support',        fixed:true  },
+      { id:'1.8',  label:'Transportation', fixed:true  },
+      { id:'1.9',  label:'Ext. Attachment',fixed:true, children:[
+        {id:'1.9.1',label:'Piping Clips'},{id:'1.9.2',label:'Insulation Supports'},
+        {id:'1.9.3',label:'Nameplate'},{id:'1.9.4',label:'External Stiffener'},
+        {id:'1.9.5',label:'Ladder Clip'},{id:'1.9.6',label:'External Coil'},
+        {id:'1.9.7',label:'Lifting Element', children:[
+          {id:'1.9.7.1',label:'Lifting Lugs'},
+          {id:'1.9.7.2',label:'Tailing Lugs'},
+          {id:'1.9.7.3',label:'Trunnions'},
+        ]},
+      ]},
+      { id:'1.10', label:'Internal Head',  fixed:true  },
+      { id:'1.11', label:'Material',       fixed:true  },
+    ];
 
-      // Internals
-      const intEl = document.getElementById('s1-internals-list');
-      if (intEl) {
-        intEl.innerHTML = `
-          <!-- 1.2.1 Removable Internal -->
-          <div class="mrd-s1-grandchild-row" style="padding-left:22px;" onclick="mrdS1Toggle('1.2.1',this)" data-id="1.2.1" id="row-1.2.1">
-            <div class="mrd-s1-checkbox" id="cb-1.2.1"></div>
-            <span class="mrd-s1-child-label" style="font-weight:600;">1.2.1 Removable Internal</span>
-            <span class="mrd-s1-chevron" id="s1-chev-1.2.1" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-          </div>
-          <div id="s1-removable-int" style="display:none; padding-left:44px;">
-            ${S1_REMOVABLE_INT.map(p => s1RowHtml(p, 'mrd-s1-grandchild-row', '')).join('')}
-          </div>
-          <!-- 1.2.2 Welded Internal -->
-          <div class="mrd-s1-grandchild-row" style="padding-left:22px;" onclick="mrdS1Toggle('1.2.2',this)" data-id="1.2.2" id="row-1.2.2">
-            <div class="mrd-s1-checkbox" id="cb-1.2.2"></div>
-            <span class="mrd-s1-child-label" style="font-weight:600;">1.2.2 Welded Internal</span>
-            <span class="mrd-s1-chevron" id="s1-chev-1.2.2" style="color:rgba(20,20,35,0.35);">&#8250;</span>
-          </div>
-          <div id="s1-welded-int" style="display:none; padding-left:44px;">
-            ${S1_WELDED_INT.map(p => s1RowHtml(p, 'mrd-s1-grandchild-row', '')).join('')}
-          </div>
-          <!-- 1.2.3 No Internal -->
-          <div class="mrd-s1-grandchild-row" style="padding-left:22px;" onclick="mrdS1Toggle('1.2.3',this)" data-id="1.2.3" id="row-1.2.3">
-            <div class="mrd-s1-checkbox" id="cb-1.2.3"></div>
-            <span class="mrd-s1-child-label" style="font-weight:600;">1.2.3 No Internal</span>
-          </div>
-        `;
-      }
-
-      // External attachments
-      const extEl = document.getElementById('s1-extatt-list');
-      if (extEl) extEl.innerHTML = S1_EXT_ATT.map(p => s1RowHtml(p, 'mrd-s1-grandchild-row', '')).join('');
+    // Flat lookup
+    const s1Map = {};
+    function s1Flatten(nodes) {
+      nodes.forEach(n => { s1Map[n.id] = n; if(n.children) s1Flatten(n.children); });
     }
+    s1Flatten(S1_TREE_L1);
 
-    function s1RowHtml(item, rowClass, indentStyle) {
-      const hasChildren = item.children && item.children.length > 0;
-      let html = `<div class="${rowClass}" ${indentStyle} onclick="mrdS1Toggle('${item.id}',this)" data-id="${item.id}" id="row-${item.id}">
-        <div class="mrd-s1-checkbox" id="cb-${item.id}"></div>
-        <span class="mrd-s1-child-label">${item.id} ${item.label}</span>
-        ${hasChildren ? `<span class="mrd-s1-chevron" id="s1-chev-${item.id}" style="color:rgba(20,20,35,0.35);">&#8250;</span>` : ''}
+    // ── Render tree (no CSS transitions = no blink) ──────────
+    function s1Render() {
+      const cols   = document.getElementById('s1-tree-cols');
+      const svgEl  = document.getElementById('s1-svg-lines');
+      if (!cols) return;
+
+      // Build HTML string — fast, no DOM thrashing
+      let html = '';
+
+      // Col 0: Root
+      html += `<div class="s1-col">
+        <div class="s1-col-label">Vessel Type</div>
+        <div class="s1-node s1-node-root" data-id="root">
+          <span class="s1-nlbl">1. Vertical Vessel</span>
+        </div>
       </div>`;
-      if (hasChildren) {
-        html += `<div id="s1-children-${item.id}" style="display:none; padding-left:18px;">
-          ${item.children.map(c => s1RowHtml(c, rowClass, '')).join('')}
+
+      // Col 1: L1 items
+      html += `<div class="s1-col" id="s1-col-1">
+        <div class="s1-col-label">Sections</div>`;
+      S1_TREE_L1.forEach(n => {
+        const isOpen = s1OpenL1 === n.id;
+        let cls = 's1-node s1-node-l1';
+        if (n.fixed) cls += ' s1-fixed';
+        if (isOpen) cls += ' s1-open';
+        const hasChev = n.children && n.children.length > 0;
+        html += `<div class="${cls}" data-id="${n.id}" onclick="s1ClickL1('${n.id}')">
+          <div class="s1-chk">${n.fixed ? '<span class="s1-fixed-dot"></span>' : ''}</div>
+          <span class="s1-nlbl">${n.label}</span>
+          ${hasChev ? `<span class="s1-chev">›</span>` : ''}
         </div>`;
+      });
+      html += `</div>`;
+
+      // Col 2: Children of open L1
+      if (s1OpenL1) {
+        const l1 = s1Map[s1OpenL1];
+        if (l1 && l1.children && l1.children.length > 0) {
+          html += `<div class="s1-col" id="s1-col-2">
+            <div class="s1-col-label">${l1.label}</div>`;
+          l1.children.forEach(n => {
+            const blocked = s1IsBlocked(n.id, l1.children);
+            const isSel   = s1Sel.has(n.id);
+            const isOpen  = s1OpenL2 === n.id;
+            let cls = 's1-node s1-node-l2';
+            if (isSel) cls += ' s1-sel';
+            if (isOpen) cls += ' s1-open';
+            if (blocked) cls += ' s1-blocked';
+            const hasChev = n.children && n.children.length > 0;
+            html += `<div class="${cls}" data-id="${n.id}" onclick="s1ClickL2('${n.id}')">
+              <div class="s1-chk"></div>
+              <span class="s1-nlbl">${n.label}</span>
+              ${hasChev ? `<span class="s1-chev">›</span>` : ''}
+            </div>`;
+          });
+          html += `</div>`;
+
+          // Col 3: Children of open L2
+          if (s1OpenL2) {
+            const l2 = s1Map[s1OpenL2];
+            if (l2 && l2.children && l2.children.length > 0) {
+              html += `<div class="s1-col" id="s1-col-3">
+                <div class="s1-col-label">${l2.label}</div>`;
+              l2.children.forEach(n => {
+                const isSel  = s1Sel.has(n.id);
+                const isOpen = s1OpenL3 === n.id;
+                const hasChev = n.children && n.children.length > 0;
+                let cls = 's1-node s1-node-l3';
+                if (isSel) cls += ' s1-sel';
+                if (isOpen) cls += ' s1-open';
+                html += `<div class="${cls}" data-id="${n.id}" onclick="s1ClickL3('${n.id}')">
+                  <div class="s1-chk"></div>
+                  <span class="s1-nlbl">${n.label}</span>
+                  ${hasChev ? `<span class="s1-chev">›</span>` : ''}
+                </div>`;
+              });
+              html += `</div>`;
+
+              // Col 4: Children of open L3 node (e.g. Support sub-items)
+              if (s1OpenL3) {
+                const l3 = s1Map[s1OpenL3];
+                if (l3 && l3.children && l3.children.length > 0) {
+                  html += `<div class="s1-col" id="s1-col-4">
+                    <div class="s1-col-label">${l3.label}</div>`;
+                  l3.children.forEach(n => {
+                    const isSel = s1Sel.has(n.id);
+                    let cls = 's1-node s1-node-l3' + (isSel ? ' s1-sel' : '');
+                    html += `<div class="${cls}" data-id="${n.id}" onclick="s1ClickLeaf('${n.id}')">
+                      <div class="s1-chk"></div>
+                      <span class="s1-nlbl">${n.label}</span>
+                    </div>`;
+                  });
+                  html += `</div>`;
+                }
+              }
+            }
+          }
+        }
       }
-      return html;
+
+      cols.innerHTML = html;
+
+      // Draw connector lines after paint
+      requestAnimationFrame(() => s1DrawLines());
+
+      // Show proceed bar
+      document.getElementById('s1-bottom-bar').classList.add('visible');
     }
 
-    // ── Toggle selection ─────────────────────────────────────
-    function mrdS1Toggle(id, row) {
-      const cb = document.getElementById('cb-' + id);
-      if (!cb) return;
+    // ── Click handlers ───────────────────────────────────────
+    function s1ClickL1(id) {
+      s1OpenL1 = (s1OpenL1 === id) ? null : id;
+      s1OpenL2 = null;
+      s1OpenL3 = null;
+      s1Render();
+    }
 
-      const isChecked = s1Sel.has(id);
-
-      // Special mutual exclusion logic
-      if (id === '1.2.3') {
-        if (!isChecked) {
-          // Selecting "No Internal" — disable 1.2.1 and 1.2.2
-          s1Sel.add(id);
-          s1SetDisabled('row-1.2.1', true);
-          s1SetDisabled('row-1.2.2', true);
-        } else {
-          s1Sel.delete(id);
-          s1SetDisabled('row-1.2.1', false);
-          s1SetDisabled('row-1.2.2', false);
-        }
-      } else if (id === '1.6.3') {
-        if (!isChecked) {
-          s1Sel.add(id);
-          s1SetDisabled('row-1.6.1', true);
-          s1SetDisabled('row-1.6.2', true);
-        } else {
-          s1Sel.delete(id);
-          s1SetDisabled('row-1.6.1', false);
-          s1SetDisabled('row-1.6.2', false);
-        }
-      } else if (id === '1.2.1') {
-        if (!isChecked) {
-          s1Sel.add(id);
-          // Show children
-          const ch = document.getElementById('s1-removable-int');
-          const chev = document.getElementById('s1-chev-1.2.1');
-          if (ch) ch.style.display = 'block';
-          if (chev) chev.classList.add('open');
-        } else {
-          s1Sel.delete(id);
-          const ch = document.getElementById('s1-removable-int');
-          const chev = document.getElementById('s1-chev-1.2.1');
-          if (ch) ch.style.display = 'none';
-          if (chev) chev.classList.remove('open');
-          // Deselect children
-          S1_REMOVABLE_INT.forEach(c => s1Sel.delete(c.id));
-          s1RefreshAll();
-        }
-      } else if (id === '1.2.2') {
-        if (!isChecked) {
-          s1Sel.add(id);
-          const ch = document.getElementById('s1-welded-int');
-          const chev = document.getElementById('s1-chev-1.2.2');
-          if (ch) ch.style.display = 'block';
-          if (chev) chev.classList.add('open');
-        } else {
-          s1Sel.delete(id);
-          const ch = document.getElementById('s1-welded-int');
-          const chev = document.getElementById('s1-chev-1.2.2');
-          if (ch) ch.style.display = 'none';
-          if (chev) chev.classList.remove('open');
-          S1_WELDED_INT.forEach(c => s1Sel.delete(c.id));
-          s1RefreshAll();
-        }
+    function s1ClickL2(id) {
+      const node = s1Map[id];
+      if (!node) return;
+      if (node.blocker) {
+        if (s1Sel.has(id)) { s1Sel.delete(id); }
+        else { s1Sel.add(id); s1OpenL2 = null; s1OpenL3 = null; }
       } else {
-        // Generic toggle
-        if (!isChecked) {
-          s1Sel.add(id);
-          // If parent item has children, show them
-          const childEl = document.getElementById('s1-children-' + id);
-          const chev = document.getElementById('s1-chev-' + id);
-          if (childEl) { childEl.style.display = 'block'; if(chev) chev.classList.add('open'); }
-        } else {
-          s1Sel.delete(id);
-          const childEl = document.getElementById('s1-children-' + id);
-          const chev = document.getElementById('s1-chev-' + id);
-          if (childEl) { childEl.style.display = 'none'; if(chev) chev.classList.remove('open'); }
-          // Remove children too
-          const allIds = s1GetAllChildIds(id);
-          allIds.forEach(cid => s1Sel.delete(cid));
-        }
-      }
-
-      s1RefreshAll();
-    }
-
-    function s1GetAllChildIds(parentId) {
-      const all = [...S1_MAT_PARTS, ...S1_REMOVABLE_INT, ...S1_WELDED_INT, ...S1_EXT_ATT];
-      for (const item of all) {
-        if (item.id === parentId && item.children) {
-          return item.children.map(c => c.id);
-        }
-      }
-      return [];
-    }
-
-    function s1SetDisabled(rowId, disabled) {
-      const row = document.getElementById(rowId);
-      if (!row) return;
-      if (disabled) {
-        row.classList.add('disabled-row');
-        row.style.opacity = '0.38';
-        row.style.pointerEvents = 'none';
-      } else {
-        row.classList.remove('disabled-row');
-        row.style.opacity = '';
-        row.style.pointerEvents = '';
-      }
-    }
-
-    function s1RefreshAll() {
-      // Refresh all checkboxes to match s1Sel
-      document.querySelectorAll('[id^="cb-"]').forEach(cb => {
-        const id = cb.id.replace('cb-', '');
         if (s1Sel.has(id)) {
-          cb.classList.add('checked');
+          s1Sel.delete(id);
+          if (node.children) node.children.forEach(c => { s1Sel.delete(c.id); if(c.children) c.children.forEach(gc => s1Sel.delete(gc.id)); });
+          if (s1OpenL2 === id) { s1OpenL2 = null; s1OpenL3 = null; }
         } else {
-          cb.classList.remove('checked');
+          s1Sel.add(id);
+          s1OpenL2 = (node.children && node.children.length > 0) ? id : s1OpenL2;
+          s1OpenL3 = null;
         }
-      });
+      }
+      s1Render();
     }
 
-    // ── Section collapse toggles ─────────────────────────────
-    function mrdS1ToggleSection(sectionId) {
-      const el = document.getElementById(sectionId);
-      const chevId = 's1-chev-' + sectionId.replace('s1-', '');
-      // Find actual chevron by section
-      const chevMap = {
-        's1-dc': 's1-chev-dc',
-        's1-mat-parts': 's1-chev-mat-parts',
-        's1-internals': 's1-chev-internals',
-        's1-mounted': 's1-chev-mounted',
-        's1-platforms': 's1-chev-platforms',
-        's1-extatt': 's1-chev-extatt',
-      };
-      const chev = document.getElementById(chevMap[sectionId] || chevId);
-      if (!el) return;
-      const isOpen = el.style.display !== 'none';
-      el.style.display = isOpen ? 'none' : 'block';
-      if (chev) chev.classList.toggle('open', !isOpen);
+    function s1ClickL3(id) {
+      const node = s1Map[id];
+      if (!node) return;
+      if (s1Sel.has(id)) {
+        s1Sel.delete(id);
+        if (node.children) node.children.forEach(c => s1Sel.delete(c.id));
+        if (s1OpenL3 === id) s1OpenL3 = null;
+      } else {
+        s1Sel.add(id);
+        if (node.children && node.children.length > 0) s1OpenL3 = id;
+      }
+      s1Render();
     }
 
-    function mrdS1ToggleAll() {
-      const ch = document.getElementById('s1-vessel-children');
-      const chev = document.getElementById('s1-chev-vessel');
-      if (!ch) return;
-      const isOpen = ch.classList.contains('open');
-      ch.classList.toggle('open', !isOpen);
-      ch.style.display = isOpen ? 'none' : 'block';
-      if (chev) chev.classList.toggle('open', !isOpen);
+    function s1ClickLeaf(id) {
+      if (s1Sel.has(id)) s1Sel.delete(id);
+      else s1Sel.add(id);
+      s1Render();
     }
 
-    // ── Division selector ────────────────────────────────────
-    function mrdS1ShowDivision() {
+    function s1IsBlocked(id, siblings) {
+      const blocker = siblings.find(s => s.blocker && s1Sel.has(s.id));
+      if (blocker && blocker.id !== id) return true;
+      const node = s1Map[id];
+      if (node && node.exclusive && s1Sel.has(node.exclusive)) return true;
+      return false;
+    }
+
+    // ── Draw connector lines (Bézier curves) ─────────────────
+    function s1DrawLines() {
+      const svg  = document.getElementById('s1-svg-lines');
+      const area = document.getElementById('s1-tree-area');
+      if (!svg || !area) return;
+
+      const aRect = area.getBoundingClientRect();
+      const scrollX = area.scrollLeft;
+      const scrollY = area.scrollTop;
+
+      let paths = '';
+      const colEls = Array.from(area.querySelectorAll('.s1-col'));
+
+      for (let ci = 0; ci < colEls.length - 1; ci++) {
+        const fromNodes = Array.from(colEls[ci].querySelectorAll('.s1-node'));
+        const toNodes   = Array.from(colEls[ci+1].querySelectorAll('.s1-node'));
+
+        fromNodes.forEach(fn => {
+          const fid = fn.dataset.id;
+          toNodes.forEach(tn => {
+            const tid = tn.dataset.id;
+            if (!s1IsParentOf(fid, tid)) return;
+            const fR = fn.getBoundingClientRect();
+            const tR = tn.getBoundingClientRect();
+            const fx = fR.right  - aRect.left + scrollX;
+            const fy = fR.top + fR.height/2 - aRect.top + scrollY;
+            const tx = tR.left   - aRect.left + scrollX;
+            const ty = tR.top + tR.height/2 - aRect.top + scrollY;
+            const mx = (fx + tx) / 2;
+            paths += `<path class="s1-conn" d="M${fx},${fy} C${mx},${fy} ${mx},${ty} ${tx},${ty}"/>`;
+          });
+        });
+      }
+      svg.innerHTML = paths;
+    }
+
+    function s1IsParentOf(parentId, childId) {
+      if (parentId === 'root') {
+        return S1_TREE_L1.some(n => n.id === childId);
+      }
+      const parent = s1Map[parentId];
+      if (!parent || !parent.children) return false;
+      return parent.children.some(c => c.id === childId);
+    }
+
+    // ── UI flow ──────────────────────────────────────────────
+    function s1ShowDivision() {
       document.getElementById('mrd-s1-opening').style.display = 'none';
-      const div = document.getElementById('mrd-s1-division');
-      div.style.display = 'flex';
-      // Auto-select Division 1
-      mrdS1SelectDivision(1);
+      document.getElementById('mrd-s1-division').style.display = 'flex';
+      s1SelectDiv(1);
     }
 
-    function mrdS1SelectDivision(n) {
-      if (n !== 1) return; // Only Div 1 proceeds
-      document.getElementById('mrd-div1-btn').classList.add('active');
-      const config = document.getElementById('mrd-s1-config');
-      config.style.display = 'flex';
-      // Build dynamic lists on first show
-      if (!config.dataset.built) {
-        s1BuildLists();
-        config.dataset.built = '1';
-      }
+    function s1SelectDiv(n) {
+      if (n !== 1) return;
+      document.getElementById('mrd-s1-config').style.display = 'flex';
+      s1Render();
     }
 
-    function mrdS1ComingSoon(btn) {
-      const toast = document.getElementById('mrd-s1-toast');
-      toast.textContent = btn.textContent + ' — Coming Soon';
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+    function s1ComingSoon(btn) {
+      const t = document.getElementById('mrd-s1-toast');
+      t.textContent = (btn.textContent || 'Division') + ' — Coming Soon';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
     }
 
-    // ── Restore state from vesselConfig ─────────────────────
-    function s1RestoreState() {
-      const cfg = window.vesselConfig;
-      // Restore inputs
-      const nameEl = document.getElementById('s1-vessel-name');
-      const tagEl  = document.getElementById('s1-equip-tag');
-      if (nameEl) nameEl.value = cfg.vesselName || '';
-      if (tagEl)  tagEl.value  = cfg.equipmentTag || '';
-
-      // Restore selections
-      s1Sel.clear();
-      (cfg.selections || []).forEach(id => s1Sel.add(id));
-
-      // Re-apply disabled states
-      if (s1Sel.has('1.2.3')) {
-        s1SetDisabled('row-1.2.1', true);
-        s1SetDisabled('row-1.2.2', true);
-      }
-      if (s1Sel.has('1.6.3')) {
-        s1SetDisabled('row-1.6.1', true);
-        s1SetDisabled('row-1.6.2', true);
-      }
-      // Re-show children for 1.2.1
-      if (s1Sel.has('1.2.1')) {
-        const ch = document.getElementById('s1-removable-int');
-        const chev = document.getElementById('s1-chev-1.2.1');
-        if (ch) ch.style.display = 'block';
-        if (chev) chev.classList.add('open');
-      }
-      // Re-show children for 1.2.2
-      if (s1Sel.has('1.2.2')) {
-        const ch = document.getElementById('s1-welded-int');
-        const chev = document.getElementById('s1-chev-1.2.2');
-        if (ch) ch.style.display = 'block';
-        if (chev) chev.classList.add('open');
-      }
-      // Re-show generic children
-      const allParentsWithChildren = [...S1_MAT_PARTS, ...S1_EXT_ATT].filter(i => i.children);
-      allParentsWithChildren.forEach(item => {
-        if (s1Sel.has(item.id)) {
-          const childEl = document.getElementById('s1-children-' + item.id);
-          const chev = document.getElementById('s1-chev-' + item.id);
-          if (childEl) { childEl.style.display = 'block'; if(chev) chev.classList.add('open'); }
-        }
-      });
-      s1RefreshAll();
-    }
-
-    // ── Proceed button ───────────────────────────────────────
+    // ── Proceed ──────────────────────────────────────────────
     function mrdS1Proceed() {
-      const nameEl = document.getElementById('s1-vessel-name');
-      const tagEl  = document.getElementById('s1-equip-tag');
-      const errName = document.getElementById('s1-err-name');
-      const errTag  = document.getElementById('s1-err-tag');
+      const nEl = document.getElementById('s1-vessel-name');
+      const tEl = document.getElementById('s1-equip-tag');
+      const eN  = document.getElementById('s1-err-name');
+      const eT  = document.getElementById('s1-err-tag');
+      let ok = true;
+      if (!nEl.value.trim()) { nEl.classList.add('s1-err'); if(eN) eN.style.display='block'; ok=false; }
+      else { nEl.classList.remove('s1-err'); if(eN) eN.style.display='none'; }
+      if (!tEl.value.trim()) { tEl.classList.add('s1-err'); if(eT) eT.style.display='block'; ok=false; }
+      else { tEl.classList.remove('s1-err'); if(eT) eT.style.display='none'; }
+      if (!ok) return;
 
-      let valid = true;
-
-      // Validate
-      if (!nameEl.value.trim()) {
-        nameEl.classList.add('mrd-s1-input-error');
-        if (errName) errName.style.display = 'block';
-        valid = false;
-      } else {
-        nameEl.classList.remove('mrd-s1-input-error');
-        if (errName) errName.style.display = 'none';
-      }
-      if (!tagEl.value.trim()) {
-        tagEl.classList.add('mrd-s1-input-error');
-        if (errTag) errTag.style.display = 'block';
-        valid = false;
-      } else {
-        tagEl.classList.remove('mrd-s1-input-error');
-        if (errTag) errTag.style.display = 'none';
-      }
-
-      if (!valid) return;
-
-      // Save config
       window.vesselConfig = {
-        vesselName: nameEl.value.trim(),
-        equipmentTag: tagEl.value.trim(),
+        vesselName: nEl.value.trim(),
+        equipmentTag: tEl.value.trim(),
         division: 'Division 1',
         selections: [...s1Sel]
       };
+      const s2t = document.getElementById('inp-tag');
+      const s2n = document.getElementById('inp-name');
+      if (s2t) s2t.value = window.vesselConfig.equipmentTag;
+      if (s2n) s2n.value = window.vesselConfig.vesselName;
 
-      // Pre-fill Step 2 fields
-      const s2Tag  = document.getElementById('inp-tag');
-      const s2Name = document.getElementById('inp-name');
-      if (s2Tag)  s2Tag.value  = window.vesselConfig.equipmentTag;
-      if (s2Name) s2Name.value = window.vesselConfig.vesselName;
-
-      // Hide Step 1, show Step 2
       document.getElementById('mrd-step1').style.display = 'none';
       document.getElementById('meridian-ui').style.display = '';
       document.getElementById('mrd-back-to-step1').style.display = 'block';
@@ -2247,29 +2185,31 @@
 
     // ── Back to Step 1 ───────────────────────────────────────
     function mrdGoToStep1() {
-      // Close any open checklist panel first
       mrdClose();
-      // Hide Step 2
       document.getElementById('meridian-ui').style.display = 'none';
       document.getElementById('mrd-back-to-step1').style.display = 'none';
-      // Show Step 1
       document.getElementById('mrd-step1').style.display = 'flex';
-      // Restore previous state
       const cfg = window.vesselConfig;
       if (cfg.vesselName || cfg.equipmentTag) {
-        // Division was already selected — go straight to config
         document.getElementById('mrd-s1-opening').style.display = 'none';
-        const div = document.getElementById('mrd-s1-division');
-        div.style.display = 'flex';
-        const config = document.getElementById('mrd-s1-config');
-        config.style.display = 'flex';
-        if (!config.dataset.built) {
-          s1BuildLists();
-          config.dataset.built = '1';
-        }
-        s1RestoreState();
+        document.getElementById('mrd-s1-division').style.display = 'flex';
+        document.getElementById('mrd-s1-config').style.display = 'flex';
+        const n = document.getElementById('s1-vessel-name');
+        const t = document.getElementById('s1-equip-tag');
+        if (n) n.value = cfg.vesselName;
+        if (t) t.value = cfg.equipmentTag;
+        s1Sel.clear();
+        (cfg.selections||[]).forEach(id => s1Sel.add(id));
+        s1Render();
       }
     }
+
+    // Redraw lines on scroll/resize
+    (() => {
+      const area = document.getElementById('s1-tree-area');
+      if (area) area.addEventListener('scroll', () => requestAnimationFrame(s1DrawLines));
+      window.addEventListener('resize', () => requestAnimationFrame(s1DrawLines));
+    })();
 
     // ═══════════════════════════════════════════════════════
     //  INIT

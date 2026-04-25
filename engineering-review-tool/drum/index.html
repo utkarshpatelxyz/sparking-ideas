@@ -119,9 +119,9 @@
 
       /* ── Main frosted card ── */
       #mrd-step1-card {
-        background: rgba(255,255,255,0.82);
-        backdrop-filter: blur(28px) saturate(1.8);
-        -webkit-backdrop-filter: blur(28px) saturate(1.8);
+        background: rgba(255,255,255,0.93);
+        backdrop-filter: blur(72px) saturate(1.4);
+        -webkit-backdrop-filter: blur(72px) saturate(1.4);
         border-radius: 20px;
         border: 1px solid rgba(255,255,255,0.78);
         box-shadow:
@@ -165,6 +165,7 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
+        min-height: 0;
         overflow: hidden;
       }
 
@@ -219,6 +220,7 @@
         flex-direction: column;
         gap: 0;
         flex: 1;
+        min-height: 0;
       }
 
       /* ASME header strip */
@@ -263,6 +265,7 @@
         display: none;
         flex-direction: column;
         flex: 1;
+        min-height: 0;
         overflow: hidden;
       }
 
@@ -311,6 +314,7 @@
       /* ── MIRO TREE inside card ── */
       .s1-tree-area {
         flex: 1;
+        min-height: 0;
         position: relative;
         overflow: auto;
         padding: 20px 32px 20px 40px;
@@ -408,6 +412,24 @@
         border-color: rgba(0,0,0,0.14);
         color: rgba(20,20,35,0.88);
       }
+      /* Green state — node has at least one descendant selected */
+      .s1-node-l1.s1-sel {
+        background: rgba(34,197,94,0.13);
+        border-color: rgba(22,163,74,0.38);
+        color: rgba(15,70,30,0.90);
+        font-weight: 600;
+      }
+      .s1-node-l1.s1-sel:hover,
+      .s1-node-l1.s1-fixed.s1-sel:hover {
+        background: rgba(34,197,94,0.20);
+        border-color: rgba(22,163,74,0.50);
+      }
+      /* Keep green even when the panel is open */
+      .s1-node-l1.s1-sel.s1-open {
+        background: rgba(34,197,94,0.18);
+        border-color: rgba(22,163,74,0.46);
+        color: rgba(15,70,30,0.92);
+      }
       .s1-node-l1.s1-fixed { cursor: default; }
       .s1-node-l1.s1-fixed:hover { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.09); }
 
@@ -422,9 +444,9 @@
         font-size: 12px;
       }
       .s1-node-l2.s1-sel {
-        background: rgba(0,0,0,0.06);
-        border-color: rgba(0,0,0,0.16);
-        color: rgba(20,20,35,0.85);
+        background: rgba(34,197,94,0.14);
+        border-color: rgba(22,163,74,0.42);
+        color: rgba(15,70,30,0.92);
         font-weight: 600;
       }
       .s1-node-l2.s1-open {
@@ -446,25 +468,28 @@
         border-radius: 8px;
       }
       .s1-node-l3.s1-sel {
-        background: rgba(0,0,0,0.05);
-        border-color: rgba(0,0,0,0.14);
-        color: rgba(20,20,35,0.82);
+        background: rgba(34,197,94,0.12);
+        border-color: rgba(22,163,74,0.36);
+        color: rgba(15,70,30,0.88);
         font-weight: 500;
       }
       .s1-node-l3.s1-blocked { opacity: 0.28; pointer-events: none; }
 
-      /* Checkmark icon (Apple SF symbol style) */
+      /* Checkmark circle — hidden; selection is shown via green node colour */
       .s1-chk {
+        display: none;
+      }
+      /* Keep the lock icon visible for the locked Components node */
+      .s1-node-l2.s1-locked .s1-chk {
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        border: 1.5px solid rgba(0,0,0,0.18);
-        background: rgba(255,255,255,0.7);
+        border: none;
+        background: rgba(20,20,35,0.82);
         flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.15s, border-color 0.15s;
         position: relative;
       }
       .s1-node.s1-sel .s1-chk,
@@ -540,7 +565,7 @@
 
       /* ── Proceed button row ── */
       .s1-bottom-bar {
-        display: none;
+        display: flex;
         padding: 14px 40px;
         border-top: 1px solid rgba(0,0,0,0.055);
         flex-shrink: 0;
@@ -548,7 +573,6 @@
         justify-content: flex-end;
         background: rgba(248,249,252,0.5);
       }
-      .s1-bottom-bar.visible { display: flex; }
       .s1-proceed-btn {
         background: rgba(20,20,35,0.88);
         color: #fff;
@@ -2157,22 +2181,21 @@
 
     // ── Tree data definition ─────────────────────────────────
     const S1_TREE_L1 = [
-      { id:'1.1',  label:'Design Condition', fixed:true,  children:[
-        { id:'1.1.1', label:'Components', locked:true, children:[
-          {id:'1.1.1.1',label:'Shell / Cone'},{id:'1.1.1.2',label:'Heads'},
-          {id:'1.1.1.3',label:'Internal Cladding'},{id:'1.1.1.4',label:'Nozzle Neck – Pipe'},
-          {id:'1.1.1.5',label:'Nozzle Neck – Plate'},{id:'1.1.1.6',label:'Nozzle Neck – Forging'},
-          {id:'1.1.1.7',label:'Reinforcing Plates'},{id:'1.1.1.8',label:'Nozzle / Body Flanges'},
-          {id:'1.1.1.9',label:'Blind Flanges'},{id:'1.1.1.10',label:'Bolting / Nuts – Ext.'},
-          {id:'1.1.1.11',label:'Gaskets – External'},{id:'1.1.1.12',label:'Name Plate'},
-          {id:'1.1.1.13',label:'Internals – Welded'},{id:'1.1.1.14',label:'Internals – Removables'},
-          {id:'1.1.1.15',label:'Ext. Welded Attach.'},{id:'1.1.1.16',label:'Bolting / Nuts – Int.'},
-          {id:'1.1.1.17',label:'Support', hasChildren:true, children:[
-            {id:'1.1.1.17.1',label:'Skirt'},{id:'1.1.1.17.2',label:'Saddle / Wrapper'},
-            {id:'1.1.1.17.3',label:'Legs'},{id:'1.1.1.17.4',label:'Others'},
-          ]},
-          {id:'1.1.1.18',label:'Anchor Bolts'},
-        ]}
+      { id:'1.1',  label:'Design Condition', fixed:true, children:[
+        { id:'1.1.1', label:'Service', children:[
+          {id:'1.1.1.1', label:'General Service'},
+          {id:'1.1.1.2', label:'Hydrogen Service'},
+          {id:'1.1.1.3', label:'H₂S / Sour Service'},
+          {id:'1.1.1.4', label:'Lethal Service'},
+          {id:'1.1.1.5', label:'Cyclic / Fatigue Service'},
+          {id:'1.1.1.6', label:'High-Temperature Service'},
+          {id:'1.1.1.7', label:'Cryogenic Service'},
+          {id:'1.1.1.8', label:'Full Vacuum Service'},
+          {id:'1.1.1.9', label:'Steam Service'},
+          {id:'1.1.1.10',label:'Corrosive / CUI Service'},
+          {id:'1.1.1.11',label:'Ammonia Service'},
+          {id:'1.1.1.12',label:'Chlorine / Acid Service'},
+        ]},
       ]},
       { id:'1.2',  label:'Internals', fixed:true, children:[
         { id:'1.2.1', label:'Removable Internal', exclusive:'1.2.3', children:[
@@ -2190,8 +2213,24 @@
         ]},
         { id:'1.2.3', label:'No Internal', blocker:true },
       ]},
-      { id:'1.3',  label:'Nozzles',        fixed:true  },
-      { id:'1.4',  label:'Mixers',         fixed:true  },
+      { id:'1.3',  label:'Nozzles', fixed:true, children:[
+        {id:'1.3.1', label:'Forged Nozzle'},
+        {id:'1.3.2', label:'Lip Type Nozzle'},
+        {id:'1.3.3', label:'Self Reinforced Nozzle'},
+        {id:'1.3.4', label:'Pad Reinforced Nozzle'},
+        {id:'1.3.5', label:'Insert Nozzle'},
+        {id:'1.3.6', label:'Manway Nozzle'},
+        {id:'1.3.7', label:'Studded Nozzle'},
+        {id:'1.3.8', label:'Elbow Nozzle'},
+      ]},
+      { id:'1.4',  label:'Mixers', fixed:true, children:[
+        {id:'1.4.1', label:'Top Entry Mixer'},
+        {id:'1.4.2', label:'Side Entry Mixer'},
+        {id:'1.4.3', label:'Bottom Entry Mixer'},
+        {id:'1.4.4', label:'Static Mixer'},
+        {id:'1.4.5', label:'Jet Mixer'},
+        {id:'1.4.6', label:'Anchor / Gate Mixer'},
+      ]},
       { id:'1.5',  label:'Mounted Equip.', fixed:true, children:[
         {id:'1.5.1',label:'Heat Exchanger'},
         {id:'1.5.2',label:'Vessel w/ Int. Skirt'},
@@ -2201,9 +2240,22 @@
         {id:'1.6.2',label:'Circular Platform', exclusive:'1.6.3'},
         {id:'1.6.3',label:'No Platform', blocker:true},
       ]},
-      { id:'1.7',  label:'Support',        fixed:true  },
-      { id:'1.8',  label:'Transportation', fixed:true  },
-      { id:'1.9',  label:'Ext. Attachment',fixed:true, children:[
+      { id:'1.7',  label:'Support', fixed:true, children:[
+        {id:'1.7.1', label:'Skirt Support'},
+        {id:'1.7.2', label:'Leg Support'},
+        {id:'1.7.3', label:'Lug / Bracket Support'},
+        {id:'1.7.4', label:'Saddle Support'},
+        {id:'1.7.5', label:'Ring Support'},
+      ]},
+      { id:'1.8',  label:'Transportation', fixed:true, children:[
+        {id:'1.8.1', label:'Lifting Lugs'},
+        {id:'1.8.2', label:'Tailing Lugs'},
+        {id:'1.8.3', label:'Shipping Saddles'},
+        {id:'1.8.4', label:'Temporary Bracing'},
+        {id:'1.8.5', label:'Nozzle Protection Covers'},
+        {id:'1.8.6', label:'Weight & CoG Documentation'},
+      ]},
+      { id:'1.9',  label:'Ext. Attachment', fixed:true, children:[
         {id:'1.9.1',label:'Piping Clips'},{id:'1.9.2',label:'Insulation Supports'},
         {id:'1.9.3',label:'Nameplate'},{id:'1.9.4',label:'External Stiffener'},
         {id:'1.9.5',label:'Ladder Clip'},{id:'1.9.6',label:'External Coil'},
@@ -2213,7 +2265,37 @@
           {id:'1.9.7.3',label:'Trunnions'},
         ]},
       ]},
-      { id:'1.10', label:'Internal Head',  fixed:true  },
+      { id:'1.10', label:'Internal Head', fixed:true, children:[
+        {id:'1.10.1', label:'Top Internal Head'},
+        {id:'1.10.2', label:'Bottom Internal Head'},
+        {id:'1.10.3', label:'Intermediate Internal Head'},
+        {id:'1.10.4', label:'Perforated Head'},
+      ]},
+      { id:'1.12', label:'Components', fixed:true, children:[
+        {id:'1.12.1', label:'Shell / Cone'},
+        {id:'1.12.2', label:'Heads'},
+        {id:'1.12.3', label:'Internal Cladding'},
+        {id:'1.12.4', label:'Nozzle Neck – Pipe'},
+        {id:'1.12.5', label:'Nozzle Neck – Plate'},
+        {id:'1.12.6', label:'Nozzle Neck – Forging'},
+        {id:'1.12.7', label:'Reinforcing Plates'},
+        {id:'1.12.8', label:'Nozzle / Body Flanges'},
+        {id:'1.12.9', label:'Blind Flanges'},
+        {id:'1.12.10',label:'Bolting / Nuts – Ext.'},
+        {id:'1.12.11',label:'Gaskets – External'},
+        {id:'1.12.12',label:'Name Plate'},
+        {id:'1.12.13',label:'Internals – Welded'},
+        {id:'1.12.14',label:'Internals – Removables'},
+        {id:'1.12.15',label:'Ext. Welded Attach.'},
+        {id:'1.12.16',label:'Bolting / Nuts – Int.'},
+        {id:'1.12.17',label:'Support Structure', children:[
+          {id:'1.12.17.1',label:'Skirt'},
+          {id:'1.12.17.2',label:'Saddle / Wrapper'},
+          {id:'1.12.17.3',label:'Legs'},
+          {id:'1.12.17.4',label:'Others'},
+        ]},
+        {id:'1.12.18',label:'Anchor Bolts'},
+      ]},
     ];
 
     // Flat lookup
@@ -2226,7 +2308,7 @@
     // ── Family grouping layer ────────────────────────────────
     const S1_TREE_FAMILIES = [
       {
-        id: 'F1', label: 'Process & Design', memberIds: ['1.1'],
+        id: 'F1', label: 'Process & Design', memberIds: ['1.1', '1.12'],
         icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>`
       },
       {
@@ -2256,9 +2338,17 @@
       '1.8':  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="9" width="22" height="9" rx="2"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="18" r="2.5"/><rect x="16" y="5.5" width="7" height="3.5" rx="1" stroke-width="1.6" opacity="0.8"/><line x1="1" y1="12.5" x2="23" y2="12.5" stroke-width="1.2" opacity="0.5"/></svg>`,
       '1.9':  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
       '1.10': `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14Q12 4 20 14"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="8.5" cy="17.5" r="2" stroke-width="1.8"/><circle cx="15.5" cy="17.5" r="2" stroke-width="1.8"/></svg>`,
-      // L2 special node
-      '1.1.1':`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+      // L1 Components (1.12) + legacy L2 node icons
+      '1.12': `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+      '1.1.1':`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`,
     };
+
+    // ── Helper: true if node itself is a leaf selection OR has ≥1 selected descendant
+    function s1HasSelDescendant(node) {
+      if (!node) return false;
+      if (!node.children || node.children.length === 0) return s1Sel.has(node.id);
+      return node.children.some(c => s1HasSelDescendant(c));
+    }
 
     // ── Render tree (no CSS transitions = no blink) ──────────
     function s1Render() {
@@ -2273,7 +2363,7 @@
       html += `<div class="s1-col">
         <div class="s1-col-label">Vessel Type</div>
         <div class="s1-node s1-node-root" data-id="root">
-          <span class="s1-nlbl">1. Vertical Vessel</span>
+          <span class="s1-nlbl">Vertical Vessel</span>
         </div>
       </div>`;
 
@@ -2281,8 +2371,13 @@
       html += `<div class="s1-col" id="s1-col-f">
         <div class="s1-col-label">Category</div>`;
       S1_TREE_FAMILIES.forEach(f => {
-        const isOpenF = s1OpenFamily === f.id;
-        let clsF = 's1-node s1-node-l1 s1-node-family' + (isOpenF ? ' s1-open' : '');
+        const isOpenF  = s1OpenFamily === f.id;
+        // Family turns green if any L1 member has a selected descendant
+        const famL1s   = S1_TREE_L1.filter(n => f.memberIds.includes(n.id));
+        const isFamSel = famL1s.some(n => s1HasSelDescendant(n));
+        let clsF = 's1-node s1-node-l1 s1-node-family'
+          + (isOpenF  ? ' s1-open' : '')
+          + (isFamSel ? ' s1-sel'  : '');
         html += `<div class="${clsF}" data-id="${f.id}" onclick="s1ClickFamily('${f.id}')">
           <span class="s1-family-icon">${f.icon}</span>
           <span class="s1-nlbl">${f.label}</span>
@@ -2298,10 +2393,13 @@
         html += `<div class="s1-col" id="s1-col-1">
           <div class="s1-col-label">Sections</div>`;
         _l1Items.forEach(n => {
-          const isOpen = s1OpenL1 === n.id;
+          const isOpen  = s1OpenL1 === n.id;
+          // L1 node turns green if any descendant is selected
+          const isL1Sel = s1HasSelDescendant(n);
           let cls = 's1-node s1-node-l1';
-          if (n.fixed) cls += ' s1-fixed';
-          if (isOpen) cls += ' s1-open';
+          if (n.fixed)  cls += ' s1-fixed';
+          if (isOpen)   cls += ' s1-open';
+          if (isL1Sel)  cls += ' s1-sel';
           const hasChev = n.children && n.children.length > 0;
           const nodeIcon = S1_NODE_ICONS[n.id] || '';
           html += `<div class="${cls}" data-id="${n.id}" onclick="s1ClickL1('${n.id}')">
@@ -2322,7 +2420,8 @@
             <div class="s1-col-label">${l1.label}</div>`;
           l1.children.forEach(n => {
             const blocked = s1IsBlocked(n.id, l1.children);
-            const isSel   = s1Sel.has(n.id);
+            const hasKids = n.children && n.children.length > 0;
+            const isSel   = hasKids ? s1HasSelDescendant(n) : s1Sel.has(n.id);
             const isOpen  = s1OpenL2 === n.id;
             let cls = 's1-node s1-node-l2';
             if (isSel)    cls += ' s1-sel';
@@ -2350,9 +2449,10 @@
               html += `<div class="s1-col" id="s1-col-3">
                 <div class="s1-col-label">${l2.label}</div>`;
               l2.children.forEach(n => {
-                const isSel  = s1Sel.has(n.id);
+                const hasKids3 = n.children && n.children.length > 0;
+                const isSel  = hasKids3 ? s1HasSelDescendant(n) : s1Sel.has(n.id);
                 const isOpen = s1OpenL3 === n.id;
-                const hasChev = n.children && n.children.length > 0;
+                const hasChev = hasKids3;
                 let cls = 's1-node s1-node-l3';
                 if (isSel) cls += ' s1-sel';
                 if (isOpen) cls += ' s1-open';
@@ -2470,13 +2570,14 @@
             s1Sel.delete(id);
           }
         } else {
-          // Not yet selected — select it and open its children panel
-          s1Sel.add(id);
           if (hasChildren) {
-            // Save old L3 state for the previous L2
+            // Parent node with children: just open the children panel (green comes from descendants)
             if (s1OpenL2) s1OpenL3PerL2[s1OpenL2] = s1OpenL3;
             s1OpenL2 = id;
             s1OpenL3 = s1OpenL3PerL2[id] || null;
+          } else {
+            // Leaf node — select it directly
+            s1Sel.add(id);
           }
         }
         // Save the current L2 state for the active L1
@@ -2645,7 +2746,7 @@
         if (t) t.value = cfg.equipmentTag;
         s1Sel.clear();
         (cfg.selections||[]).forEach(id => s1Sel.add(id));
-        s1Sel.add('1.1.1'); // Components is always locked
+        // Components is now a standalone L1 section — no pre-seeding needed
         // Clear and re-derive the open-state memory from saved selections
         Object.keys(s1OpenL2PerL1).forEach(k => delete s1OpenL2PerL1[k]);
         Object.keys(s1OpenL3PerL2).forEach(k => delete s1OpenL3PerL2[k]);
@@ -2733,7 +2834,7 @@
     // ═══════════════════════════════════════════════════════
     //  INIT
     // ═══════════════════════════════════════════════════════
-    s1Sel.add('1.1.1'); // Components is always locked — pre-select so children are accessible
+    // Components is now a standalone L1 section — no pre-seeding needed
     mrdBuildGrid();
     </script>
 </body>

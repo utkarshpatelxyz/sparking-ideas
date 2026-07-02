@@ -1,0 +1,248 @@
+/* ============================================================
+   AntarMan (अंतर्मन) — Custom Styling & Micro-Interactions
+   Tailwind handles layout; this file covers everything
+   Tailwind cannot do natively.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. CUSTOM SCROLLBAR — thin, dark, integrated
+   ------------------------------------------------------------ */
+#chat-container {
+  scrollbar-width: thin;                      /* Firefox */
+  scrollbar-color: #3f3f46 transparent;       /* Firefox */
+}
+
+#chat-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+#chat-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#chat-container::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+#chat-container::-webkit-scrollbar-thumb:hover {
+  background-color: #d97706;
+}
+
+/* Textarea scrollbar (when the user writes long messages) */
+#user-input {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+  max-height: 10rem;
+}
+
+#user-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+#user-input::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+  border-radius: 9999px;
+}
+
+/* ------------------------------------------------------------
+   2. AMBER / MAROON RIM-LIGHTING GLOW EFFECTS
+   ------------------------------------------------------------ */
+.glow-input:focus {
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(245, 158, 11, 0.35),
+    0 0 18px rgba(245, 158, 11, 0.18),
+    0 0 42px rgba(127, 29, 29, 0.28);
+}
+
+.glow-btn:focus-visible {
+  box-shadow:
+    0 0 0 2px rgba(245, 158, 11, 0.55),
+    0 0 20px rgba(127, 29, 29, 0.45);
+}
+
+.send-btn {
+  box-shadow:
+    0 0 14px rgba(245, 158, 11, 0.18),
+    0 0 30px rgba(127, 29, 29, 0.25);
+}
+
+.send-btn:hover:not(:disabled) {
+  box-shadow:
+    0 0 18px rgba(245, 158, 11, 0.32),
+    0 0 44px rgba(127, 29, 29, 0.4);
+}
+
+/* Active (latest) AI bubble gets a soft rim light */
+.bubble-ai.bubble-active {
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow:
+    0 0 16px rgba(245, 158, 11, 0.08),
+    0 0 34px rgba(127, 29, 29, 0.18);
+}
+
+/* ------------------------------------------------------------
+   3. CHAT BUBBLE FADE-IN + SLIDE-UP ENTRANCE
+   ------------------------------------------------------------ */
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.bubble-enter {
+  animation: bubbleIn 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+}
+
+/* ------------------------------------------------------------
+   4. PULSING 3-DOT TYPING INDICATOR
+   ------------------------------------------------------------ */
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 2px;
+}
+
+.typing-indicator .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f59e0b, #7f1d1d);
+  animation: dotPulse 1.2s infinite ease-in-out;
+}
+
+.typing-indicator .dot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.typing-indicator .dot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes dotPulse {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0) scale(0.85);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-6px) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------
+   5. MARKDOWN TYPOGRAPHY INSIDE CHAT BUBBLES
+   ------------------------------------------------------------ */
+.bubble-content {
+  line-height: 1.65;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.bubble-content p {
+  margin: 0 0 0.65em 0;
+}
+
+.bubble-content p:last-child {
+  margin-bottom: 0;
+}
+
+.bubble-content strong {
+  font-weight: 700;
+  color: #fcd34d; /* amber-300 — warm emphasis */
+}
+
+.bubble-user .bubble-content strong {
+  color: #fff7ed;
+}
+
+.bubble-content em {
+  font-style: italic;
+  color: #e5e5e5;
+}
+
+.bubble-content ul {
+  list-style-type: disc;
+  margin: 0.5em 0 0.75em 0;
+  padding-left: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+
+.bubble-content ol {
+  list-style-type: decimal;
+  margin: 0.5em 0 0.75em 0;
+  padding-left: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+
+.bubble-content li {
+  padding-left: 0.15em;
+}
+
+.bubble-content li::marker {
+  color: #f59e0b; /* amber-500 markers */
+}
+
+.bubble-content code {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.875em;
+  background-color: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: 6px;
+  padding: 0.15em 0.45em;
+  color: #fbbf24;
+  white-space: pre-wrap;
+}
+
+.bubble-content h1,
+.bubble-content h2,
+.bubble-content h3 {
+  font-weight: 700;
+  color: #fafafa;
+  margin: 0.7em 0 0.4em 0;
+  line-height: 1.3;
+}
+
+.bubble-content h1 {
+  font-size: 1.2em;
+}
+
+.bubble-content h2 {
+  font-size: 1.1em;
+}
+
+.bubble-content h3 {
+  font-size: 1.02em;
+}
+
+/* ------------------------------------------------------------
+   6. REDUCED MOTION — respect user accessibility settings
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .bubble-enter {
+    animation: none;
+  }
+
+  .typing-indicator .dot {
+    animation-duration: 2s;
+  }
+
+  #chat-container {
+    scroll-behavior: auto;
+  }
+}

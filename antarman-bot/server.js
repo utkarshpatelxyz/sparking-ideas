@@ -325,35 +325,6 @@ app.get("/api/health", (req, res) => {
 });
 
 // ------------------------------------------------------------
-// TEMPORARY DEBUG endpoint — remove once chat is confirmed working.
-// Calls the active provider directly and reports the live key prefix
-// plus the exact upstream status and body. Always returns 200.
-// ------------------------------------------------------------
-app.get("/api/diag", async (req, res) => {
-  const info = {
-    version: "3.0.0",
-    provider: PROVIDER.name,
-    model: PROVIDER.model,
-    keyConfigured: Boolean(PROVIDER.apiKey),
-    keyPrefix: PROVIDER.apiKey ? PROVIDER.apiKey.slice(0, 5) + "…" : null,
-    keyLength: PROVIDER.apiKey ? PROVIDER.apiKey.length : 0,
-  };
-  if (!PROVIDER.apiKey) {
-    return res.status(200).json({ ...info, note: "No AI key is set on the server." });
-  }
-  try {
-    const result = await callProvider([], "ping");
-    return res.status(200).json({
-      ...info,
-      upstreamStatus: result.status,
-      upstreamBody: (result.raw || "").slice(0, 1200),
-    });
-  } catch (e) {
-    return res.status(200).json({ ...info, fetchError: String((e && e.message) || e) });
-  }
-});
-
-// ------------------------------------------------------------
 // Start the server when run directly; export the app for Vercel.
 // ------------------------------------------------------------
 if (require.main === module) {

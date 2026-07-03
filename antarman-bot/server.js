@@ -2,9 +2,8 @@
  * ============================================================
  * AntarMan (अंतर्मन) — Secure Backend Proxy Server
  * ============================================================
- * This server keeps the Gemini API key safely on the server
- * side and exposes a single POST /api/chat endpoint that the
- * frontend talks to. The frontend never sees the API key.
+ * This version completely removes the Google SDK to bypass 
+ * all token formatting errors, utilizing native Node fetch.
  * ============================================================
  */
 
@@ -12,19 +11,18 @@ const path = require("path");
 const dotenv = require("dotenv");
 const express = require("express");
 const cors = require("cors");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Load environment variables from the .env file
+// Load environment variables
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
+// Using your hardcoded key directly
 const GEMINI_API_KEY = "AQ.Ab8RN6JH2i0mq2kBM5Spt0YZElZqYFb5H6Qk6dNcDwR86BtI7A";
 
 // ------------------------------------------------------------
 // Express application setup
 // ------------------------------------------------------------
 const app = express();
-
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -81,122 +79,39 @@ emergencies:
 - Be a companion first: acknowledge feelings before offering solutions.
 `.trim();
 
-// ------------------------------------------------------------
-// Gemini SDK setup
-// ------------------------------------------------------------
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
-  systemInstruction: ANTARMAN_SYSTEM_INSTRUCTION,
-  generationConfig: {
-    temperature: 0.8,
-    topP: 0.95,
-    topK: 40,
-    maxOutputTokens: 2048,
-  },
-});
-
 /**
- * Sanitizes and normalizes the chat history array sent by the frontend
- * into the exact shape the Gemini SDK expects:
- * [{ role: "user" | "model", parts: [{ text: "..." }] }, ...]
- *
- * Any malformed entries are silently dropped so a corrupted client
- * payload can never crash the model call.
+ * Sanitizes chat history for the native REST payload
  */
 function buildSafeHistory(rawHistory) {
-  if (!Array.isArray(rawHistory)) {
-    return [];
-  }
-
+  if (!Array.isArray(rawHistory)) return [];
   const safe = [];
-
+  
   for (const entry of rawHistory) {
     if (!entry || typeof entry !== "object") continue;
-
     const role = entry.role === "model" ? "model" : entry.role === "user" ? "user" : null;
     if (!role) continue;
 
     let text = "";
     if (typeof entry.text === "string") {
       text = entry.text;
-    } else if (
-      Array.isArray(entry.parts) &&
-      entry.parts.length > 0 &&
-      typeof entry.parts[0].text === "string"
-    ) {
+    } else if (Array.isArray(entry.parts) && entry.parts.length > 0 && typeof entry.parts[0].text === "string") {
       text = entry.parts[0].text;
     }
 
     text = text.trim();
     if (!text) continue;
-
     safe.push({ role, parts: [{ text }] });
   }
 
-  // Gemini requires the history to start with a "user" turn.
   while (safe.length > 0 && safe[0].role !== "user") {
     safe.shift();
   }
-
   return safe;
 }
 
 // ------------------------------------------------------------
-// POST /api/chat — the main conversation endpoint
+// POST /api/chat — using Native Node fetch instead of SDK
 // ------------------------------------------------------------
 app.post("/api/chat", async (req, res) => {
   try {
-    const { message, history } = req.body || {};
-
-    if (typeof message !== "string" || !message.trim()) {
-      return res.status(400).json({
-        error: "A non-empty 'message' string is required.",
-      });
-    }
-
-    const trimmedMessage = message.trim().slice(0, 8000);
-    const safeHistory = buildSafeHistory(history);
-
-    const chat = model.startChat({ history: safeHistory });
-    const result = await chat.sendMessage(trimmedMessage);
-    const responseText = result.response.text();
-
-    return res.status(200).json({ reply: responseText });
-  } catch (error) {
-    // Log the raw error safely on the server — never leak it to the client.
-    console.error("[AntarMan] Gemini API error:", error && error.message ? error.message : error);
-
-    return res.status(500).json({
-      error:
-        "Kshama kijiye 🙏 — AntarMan abhi thoda vishram kar raha hai. " +
-        "(Apologies — AntarMan is resting for a moment. This can happen if the " +
-        "free API quota is briefly exceeded or the key is invalid. " +
-        "Please try again in a few seconds.)",
-    });
-  }
-});
-
-// ------------------------------------------------------------
-// Health check endpoint (useful for Render/Railway deployments)
-// ------------------------------------------------------------
-app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", service: "AntarMan", model: "gemini-2.0-flash" });
-});
-
-// ------------------------------------------------------------
-// Start the server
-// ------------------------------------------------------------
-// Only bind a port when run directly (e.g. `node server.js` locally,
-// or on Render/Railway). Serverless platforms like Vercel import this
-// file as a request handler instead, via `module.exports = app`.
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log("============================================");
-    console.log("  AntarMan | अंतर्मन  —  Your Inner Voice");
-    console.log(`  Server running at: http://localhost:${PORT}`);
-    console.log("============================================");
-  });
-}
-
-module.exports = app;
+    const { message, history } = req

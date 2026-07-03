@@ -16,8 +16,8 @@ const cors = require("cors");
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-// Using your hardcoded AQ. key
-const GEMINI_API_KEY = "AQ.Ab8RN6JH2i0mq2kBM5Spt0YZElZqYFb5H6Qk6dNcDwR86BtI7A";
+// Using the correct AQ. key (removed the accidental "NAME" typo from the end)
+const GEMINI_API_KEY = "AQ.Ab8RN6LzYFBoaXggyLifEY3r4l3u8arVxkscu55Ozk6h2dfDWw";
 
 // ------------------------------------------------------------
 // Express application setup
@@ -140,15 +140,15 @@ app.post("/api/chat", async (req, res) => {
       }
     };
 
-    // 2. Fire directly at the active Gemini 3.5 Flash endpoint (Removed deprecated 2.0 URL)
+    // 2. Fire directly at the active Gemini 3.5 Flash endpoint
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent`;
     
-    // 3. Inject the AQ. key directly into the headers instead of the URL query string
+    // 3. Inject the AQ. key as a Bearer Token in the Authorization header
     const response = await fetch(url, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "x-goog-api-key": GEMINI_API_KEY
+        "Authorization": `Bearer ${GEMINI_API_KEY}`
       },
       body: JSON.stringify(payload)
     });

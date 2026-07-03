@@ -61,10 +61,12 @@ Basic static web hosting (HTML/CSS only) **cannot** run this app, because it nee
 4. Railway auto-detects Node.js, runs `npm install`, and starts it with `npm start`. Click **Generate Domain** under Settings to get your public URL.
 
 ### Option C: Vercel
+The repo includes a `vercel.json` that wraps `server.js` as a serverless function (via `@vercel/node`) and routes every request to it, so the Express app — including the static `public/` frontend and the `/api/chat` endpoint — works as-is.
 1. Go to [https://vercel.com](https://vercel.com) and sign in with GitHub.
 2. Click **Add New → Project** and import your repository.
-3. Add the `GEMINI_API_KEY` environment variable during import.
-4. Note: Vercel is optimized for serverless functions, so a long-running Express server may need a small adapter config. For this app's classic Express structure, **Render or Railway is the smoother choice**.
+3. Set **Root Directory** to `antarman-bot`.
+4. Add the `GEMINI_API_KEY` environment variable during import (Vercel auto-detects the `@vercel/node` build from `vercel.json`, so no build/start command changes are needed).
+5. Click **Deploy**. You'll get a live URL like `https://antarman.vercel.app` in under a minute.
 
 ## Safety Note
 

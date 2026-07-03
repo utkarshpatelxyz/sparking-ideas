@@ -199,9 +199,16 @@ app.get("/api/health", (req, res) => {
 // ------------------------------------------------------------
 // Start the server
 // ------------------------------------------------------------
-app.listen(PORT, () => {
-  console.log("============================================");
-  console.log("  AntarMan | अंतर्मन  —  Your Inner Voice");
-  console.log(`  Server running at: http://localhost:${PORT}`);
-  console.log("============================================");
-});
+// Only bind a port when run directly (e.g. `node server.js` locally,
+// or on Render/Railway). Serverless platforms like Vercel import this
+// file as a request handler instead, via `module.exports = app`.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log("============================================");
+    console.log("  AntarMan | अंतर्मन  —  Your Inner Voice");
+    console.log(`  Server running at: http://localhost:${PORT}`);
+    console.log("============================================");
+  });
+}
+
+module.exports = app;

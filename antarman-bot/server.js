@@ -1,10 +1,10 @@
 /**
  * ============================================================
- *  AntarMan (अंतर्मन) — Secure Backend Proxy Server
+ *   AntarMan (अंतर्मन) — Secure Backend Proxy Server
  * ============================================================
- *  This server keeps the Gemini API key safely on the server
- *  side and exposes a single POST /api/chat endpoint that the
- *  frontend talks to. The frontend never sees the API key.
+ *   This server keeps the Gemini API key safely on the server
+ *   side and exposes a single POST /api/chat endpoint that the
+ *   frontend talks to. The frontend never sees the API key.
  * ============================================================
  */
 
@@ -110,7 +110,7 @@ const model = genAI.getGenerativeModel({
 /**
  * Sanitizes and normalizes the chat history array sent by the frontend
  * into the exact shape the Gemini SDK expects:
- *   [{ role: "user" | "model", parts: [{ text: "..." }] }, ...]
+ *    [{ role: "user" | "model", parts: [{ text: "..." }] }, ...]
  *
  * Any malformed entries are silently dropped so a corrupted client
  * payload can never crash the model call.
@@ -192,7 +192,7 @@ app.post("/api/chat", async (req, res) => {
 // Health check endpoint (useful for Render/Railway deployments)
 // ------------------------------------------------------------
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", service: "AntarMan", model: "gemini-1.5-flash" });
+  res.status(200).json({ status: "ok", service: "AntarMan", model: "gemini-2.5-flash" });
 });
 
 // ------------------------------------------------------------

@@ -2,10 +2,15 @@
  * ============================================================
  *  AntarMan (अंतर्मन) — Secure Backend Proxy Server
  * ============================================================
- *  Keeps the Gemini API key on the server and exposes POST
- *  /api/chat to the frontend. Uses native fetch (no SDK), which
- *  is serverless-friendly on Vercel. Runs as a normal server
- *  locally / on Render, and is exported for Vercel functions.
+ *  Keeps the AI provider key on the server and exposes POST
+ *  /api/chat to the frontend. Provider-flexible via env vars:
+ *
+ *    • Groq (free, no card):  set GROQ_API_KEY
+ *    • Any OpenAI-compatible: set LLM_API_KEY + LLM_BASE_URL
+ *    • Google Gemini:         set GEMINI_API_KEY
+ *
+ *  Priority: Groq → generic OpenAI-compatible → Gemini.
+ *  Uses native fetch (no SDK), which is serverless-friendly.
  * ============================================================
  */
 
@@ -18,18 +23,43 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-// The API key lives ONLY in the environment — never hardcode it.
-// Get a valid Gemini API key at: https://aistudio.google.com/app/apikey
-// (It must be a standard Gemini "AIza…" key, NOT an OAuth/"AQ." token.)
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// ------------------------------------------------------------
+// Provider resolution — pick whichever key is configured.
+// ------------------------------------------------------------
+function resolveProvider() {
+  if (process.env.GROQ_API_KEY) {
+    return {
+      name: "groq",
+      kind: "openai",
+      baseUrl: "https://api.groq.com/openai/v1",
+      apiKey: process.env.GROQ_API_KEY,
+      model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    };
+  }
+  if (process.env.LLM_API_KEY && process.env.LLM_BASE_URL) {
+    return {
+      name: "openai-compatible",
+      kind: "openai",
+      baseUrl: process.env.LLM_BASE_URL.replace(/\/+$/, ""),
+      apiKey: process.env.LLM_API_KEY,
+      model: process.env.LLM_MODEL || "gpt-3.5-turbo",
+    };
+  }
+  return {
+    name: "gemini",
+    kind: "gemini",
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+    apiKey: process.env.GEMINI_API_KEY || "",
+    model: process.env.GEMINI_MODEL || "gemini-2.0-flash",
+  };
+}
 
-// Model is configurable so it can be updated without a code change.
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const PROVIDER = resolveProvider();
 
-if (!GEMINI_API_KEY) {
+if (!PROVIDER.apiKey) {
   console.warn(
-    "[AntarMan] WARNING: GEMINI_API_KEY is not set. /api/chat will return a " +
-      "configuration error until you add it to the environment."
+    "[AntarMan] WARNING: no AI key is set. Set GROQ_API_KEY (free, no card) " +
+      "or GEMINI_API_KEY. /api/chat will return a configuration error until then."
   );
 }
 
@@ -94,9 +124,9 @@ emergencies:
 `.trim();
 
 /**
- * Normalizes the frontend history array into the shape the Gemini REST
- * API expects: [{ role: "user" | "model", parts: [{ text }] }, ...].
- * Malformed entries are dropped so a bad payload can never crash the call.
+ * Normalizes the frontend history into a neutral shape:
+ *   [{ role: "user" | "model", text }]
+ * Malformed entries are dropped so a bad payload can't crash the call.
  */
 function buildSafeHistory(rawHistory) {
   if (!Array.isArray(rawHistory)) return [];
@@ -119,69 +149,121 @@ function buildSafeHistory(rawHistory) {
 
     text = text.trim();
     if (!text) continue;
-    safe.push({ role, parts: [{ text }] });
+    safe.push({ role, text });
   }
-  // Gemini requires the history to start with a "user" turn.
   while (safe.length > 0 && safe[0].role !== "user") safe.shift();
   return safe;
 }
 
 /**
- * Maps a Google API HTTP error into a clear, actionable message.
- * Returned to the client so misconfigurations are diagnosable in the UI.
+ * Maps a provider HTTP error into a clear, actionable message.
  */
 function friendlyError(status, bodyText) {
   const t = (bodyText || "").toLowerCase();
-  if (status === 401 || t.includes("oauth 2 access token") || t.includes("unauthenticated")) {
-    return (
-      "AntarMan's server credential was rejected (401). The GEMINI_API_KEY is missing " +
-      "or is not a valid Gemini API key. Use a standard 'AIza…' key from " +
-      "Google AI Studio — an OAuth-style 'AQ.' token will not work here."
-    );
+  if (status === 401 || t.includes("oauth 2 access token") || t.includes("unauthenticated") || t.includes("invalid api key")) {
+    return "The AI provider rejected the key (401). Check that the API key set on the server is valid and active.";
   }
   if (status === 400 && t.includes("api_key_invalid")) {
-    return "The Gemini API key is invalid (400). Please set a valid key in GEMINI_API_KEY.";
+    return "The API key is invalid (400). Please set a valid key in the server environment.";
   }
   if (status === 403) {
-    return "Access denied (403) — the key may lack access to this model, or the Generative Language API isn't enabled for it.";
+    return "Access denied (403) — the key may lack access to this model.";
   }
   if (status === 404) {
     return (
-      "The AI model '" + GEMINI_MODEL + "' was not found (404) — it may be retired. " +
-      "Set the GEMINI_MODEL env var to a current model (e.g. gemini-2.0-flash)."
+      "The model '" + PROVIDER.model + "' was not found (404). Set the model env var " +
+      "(GROQ_MODEL / LLM_MODEL / GEMINI_MODEL) to a current model name."
     );
   }
   if (status === 429) {
-    // Surface which quota tripped and the suggested retry delay, so a
-    // temporary rate limit is distinguishable from a project with zero quota.
     let detail = "";
-    try {
-      const parsed = JSON.parse(bodyText);
-      const details = (parsed.error && parsed.error.details) || [];
-      for (const d of details) {
-        if (d["@type"] && d["@type"].includes("QuotaFailure") && Array.isArray(d.violations)) {
-          const v = d.violations[0] || {};
-          if (v.quotaId || v.quotaMetric) {
-            detail += " Quota: " + (v.quotaId || v.quotaMetric);
-            if (v.quotaValue !== undefined) detail += " (limit " + v.quotaValue + ")";
-            detail += ".";
-          }
-        }
-        if (d["@type"] && d["@type"].includes("RetryInfo") && d.retryDelay) {
-          detail += " Retry in " + d.retryDelay + ".";
-        }
-      }
-    } catch (e) {
-      /* body wasn't JSON — keep the generic message */
+    if (t.includes("limit: 0") || t.includes("limit 0")) {
+      detail =
+        " This key's project has ZERO free-tier quota — switch to a free provider like " +
+        "Groq (set GROQ_API_KEY) or use a key from a non-org Google account.";
+    } else {
+      detail = " Please wait a little and try again.";
     }
-    return (
-      "Rate limit reached (429)." + (detail || " Please wait a little and try again.") +
-      (detail.indexOf("limit 0") !== -1
-        ? " A limit of 0 means this Google Cloud project has no free-tier quota for this model — enable billing on the project or use a key from a personal AI Studio account."
-        : "")
-    );
+    return "Rate limit reached (429)." + detail;
   }
   return "The AI service returned an error (HTTP " + status + "). Please try again shortly.";
+}
+
+// ------------------------------------------------------------
+// Provider callers — each returns { status, text, raw }.
+// ------------------------------------------------------------
+async function callGemini(safeHistory, userMessage) {
+  const contents = [
+    ...safeHistory.map((m) => ({ role: m.role, parts: [{ text: m.text }] })),
+    { role: "user", parts: [{ text: userMessage }] },
+  ];
+  const payload = {
+    systemInstruction: { parts: [{ text: ANTARMAN_SYSTEM_INSTRUCTION }] },
+    contents,
+    generationConfig: { temperature: 0.8, topP: 0.95, topK: 40, maxOutputTokens: 2048 },
+  };
+  const r = await fetch(PROVIDER.baseUrl + "/models/" + PROVIDER.model + ":generateContent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": PROVIDER.apiKey },
+    body: JSON.stringify(payload),
+  });
+  const raw = await r.text();
+  if (!r.ok) return { status: r.status, text: "", raw };
+  let text = "";
+  try {
+    const data = JSON.parse(raw);
+    text =
+      (data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].content &&
+        data.candidates[0].content.parts &&
+        data.candidates[0].content.parts[0] &&
+        data.candidates[0].content.parts[0].text) ||
+      "";
+  } catch (e) {
+    /* fallthrough */
+  }
+  return { status: r.status, text, raw };
+}
+
+async function callOpenAICompatible(safeHistory, userMessage) {
+  const messages = [
+    { role: "system", content: ANTARMAN_SYSTEM_INSTRUCTION },
+    ...safeHistory.map((m) => ({
+      role: m.role === "model" ? "assistant" : "user",
+      content: m.text,
+    })),
+    { role: "user", content: userMessage },
+  ];
+  const r = await fetch(PROVIDER.baseUrl + "/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + PROVIDER.apiKey,
+    },
+    body: JSON.stringify({
+      model: PROVIDER.model,
+      messages,
+      temperature: 0.8,
+      max_tokens: 2048,
+    }),
+  });
+  const raw = await r.text();
+  if (!r.ok) return { status: r.status, text: "", raw };
+  let text = "";
+  try {
+    const data = JSON.parse(raw);
+    text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
+  } catch (e) {
+    /* fallthrough */
+  }
+  return { status: r.status, text, raw };
+}
+
+function callProvider(safeHistory, userMessage) {
+  return PROVIDER.kind === "openai"
+    ? callOpenAICompatible(safeHistory, userMessage)
+    : callGemini(safeHistory, userMessage);
 }
 
 // ------------------------------------------------------------
@@ -189,11 +271,11 @@ function friendlyError(status, bodyText) {
 // ------------------------------------------------------------
 app.post("/api/chat", async (req, res) => {
   try {
-    if (!GEMINI_API_KEY) {
+    if (!PROVIDER.apiKey) {
       return res.status(500).json({
         error:
-          "Server is missing GEMINI_API_KEY. Add a valid Gemini API key in the " +
-          "hosting environment (e.g. Vercel → Settings → Environment Variables), then redeploy.",
+          "Server has no AI key configured. Set GROQ_API_KEY (free, no card) or " +
+          "GEMINI_API_KEY in the hosting environment, then redeploy.",
       });
     }
 
@@ -205,56 +287,19 @@ app.post("/api/chat", async (req, res) => {
     const trimmedMessage = message.trim().slice(0, 8000);
     const safeHistory = buildSafeHistory(history);
 
-    const payload = {
-      systemInstruction: { parts: [{ text: ANTARMAN_SYSTEM_INSTRUCTION }] },
-      contents: [...safeHistory, { role: "user", parts: [{ text: trimmedMessage }] }],
-      generationConfig: { temperature: 0.8, topP: 0.95, topK: 40, maxOutputTokens: 2048 },
-    };
+    const result = await callProvider(safeHistory, trimmedMessage);
 
-    // Canonical Gemini REST auth: the API key goes in the x-goog-api-key header.
-    const url =
-      "https://generativelanguage.googleapis.com/v1beta/models/" +
-      GEMINI_MODEL +
-      ":generateContent";
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": GEMINI_API_KEY,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("[AntarMan] Gemini API error:", response.status, errText.slice(0, 600));
-      return res.status(502).json({ error: friendlyError(response.status, errText) });
+    if (result.status < 200 || result.status >= 300) {
+      console.error("[AntarMan] " + PROVIDER.name + " error:", result.status, (result.raw || "").slice(0, 600));
+      return res.status(502).json({ error: friendlyError(result.status, result.raw) });
     }
 
-    const data = await response.json();
-    const responseText =
-      data &&
-      data.candidates &&
-      data.candidates[0] &&
-      data.candidates[0].content &&
-      data.candidates[0].content.parts &&
-      data.candidates[0].content.parts[0] &&
-      data.candidates[0].content.parts[0].text;
-
-    if (!responseText) {
-      const blockReason =
-        (data && data.promptFeedback && data.promptFeedback.blockReason) ||
-        (data && data.candidates && data.candidates[0] && data.candidates[0].finishReason);
-      console.error("[AntarMan] Empty candidate:", JSON.stringify(data).slice(0, 600));
-      return res.status(502).json({
-        error: blockReason
-          ? "AntarMan couldn't respond to that (" + blockReason + "). Please try rephrasing."
-          : "AntarMan received an empty response. Please try again.",
-      });
+    if (!result.text) {
+      console.error("[AntarMan] Empty response:", (result.raw || "").slice(0, 600));
+      return res.status(502).json({ error: "AntarMan received an empty response. Please try again." });
     }
 
-    return res.status(200).json({ reply: responseText });
+    return res.status(200).json({ reply: result.text });
   } catch (error) {
     console.error("[AntarMan] Server error:", error && error.message ? error.message : error);
     return res.status(500).json({
@@ -266,46 +311,43 @@ app.post("/api/chat", async (req, res) => {
 });
 
 // ------------------------------------------------------------
-// Health check — reports config without leaking the key
+// Health check — reports the active provider without leaking the key
 // ------------------------------------------------------------
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "ok",
     service: "AntarMan",
-    version: "2.2.0",
-    model: GEMINI_MODEL,
-    keyConfigured: Boolean(GEMINI_API_KEY),
+    version: "3.0.0",
+    provider: PROVIDER.name,
+    model: PROVIDER.model,
+    keyConfigured: Boolean(PROVIDER.apiKey),
   });
 });
 
 // ------------------------------------------------------------
 // TEMPORARY DEBUG endpoint — remove once chat is confirmed working.
-// Calls Google directly and reports which key is live (first chars
-// only) plus the exact upstream status and body, so quota/auth issues
-// are unambiguous. Always returns 200 so it renders in a browser.
+// Calls the active provider directly and reports the live key prefix
+// plus the exact upstream status and body. Always returns 200.
 // ------------------------------------------------------------
 app.get("/api/diag", async (req, res) => {
   const info = {
-    version: "2.2.0",
-    model: GEMINI_MODEL,
-    keyConfigured: Boolean(GEMINI_API_KEY),
-    keyPrefix: GEMINI_API_KEY ? GEMINI_API_KEY.slice(0, 5) + "…" : null,
-    keyLength: GEMINI_API_KEY ? GEMINI_API_KEY.length : 0,
+    version: "3.0.0",
+    provider: PROVIDER.name,
+    model: PROVIDER.model,
+    keyConfigured: Boolean(PROVIDER.apiKey),
+    keyPrefix: PROVIDER.apiKey ? PROVIDER.apiKey.slice(0, 5) + "…" : null,
+    keyLength: PROVIDER.apiKey ? PROVIDER.apiKey.length : 0,
   };
-  if (!GEMINI_API_KEY) {
-    return res.status(200).json({ ...info, note: "GEMINI_API_KEY is not set on the server." });
+  if (!PROVIDER.apiKey) {
+    return res.status(200).json({ ...info, note: "No AI key is set on the server." });
   }
   try {
-    const r = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
-        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "ping" }] }] }),
-      }
-    );
-    const text = await r.text();
-    return res.status(200).json({ ...info, upstreamStatus: r.status, upstreamBody: text.slice(0, 1200) });
+    const result = await callProvider([], "ping");
+    return res.status(200).json({
+      ...info,
+      upstreamStatus: result.status,
+      upstreamBody: (result.raw || "").slice(0, 1200),
+    });
   } catch (e) {
     return res.status(200).json({ ...info, fetchError: String((e && e.message) || e) });
   }
@@ -318,7 +360,7 @@ if (require.main === module) {
   app.listen(PORT, () => {
     console.log("============================================");
     console.log("  AntarMan | अंतर्मन  —  Your Inner Voice");
-    console.log("  Model: " + GEMINI_MODEL);
+    console.log("  Provider: " + PROVIDER.name + "  Model: " + PROVIDER.model);
     console.log("  Server running at: http://localhost:" + PORT);
     console.log("============================================");
   });

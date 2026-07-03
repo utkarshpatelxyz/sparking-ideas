@@ -18,18 +18,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-// Fail fast (with a helpful message) if the API key is missing
-if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_FREE_GEMINI_API_KEY_HERE") {
-  console.error(
-    "\n[AntarMan] FATAL: GEMINI_API_KEY is missing or still a placeholder.\n" +
-      "1. Copy .env.example to a new file named .env\n" +
-      "2. Paste your free key from https://aistudio.google.com/app/apikey\n" +
-      "3. Restart the server with: npm start\n"
-  );
-  process.exit(1);
-}
+const GEMINI_API_KEY = "AQ.Ab8RN6JH2i0mq2kBM5Spt0YZElZqYFb5H6Qk6dNcDwR86BtI7A";
 
 // ------------------------------------------------------------
 // Express application setup
@@ -95,7 +84,7 @@ emergencies:
 // ------------------------------------------------------------
 // Gemini SDK setup
 // ------------------------------------------------------------
-const genAI = new GoogleGenerativeAI("AQ.Ab8RN6JH2i0mq2kBM5Spt0YZElZqYFb5H6Qk6dNcDwR86BtI7A");
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
   model: "gemini-2.0-flash",
   systemInstruction: ANTARMAN_SYSTEM_INSTRUCTION,
@@ -198,4 +187,16 @@ app.get("/api/health", (req, res) => {
 // ------------------------------------------------------------
 // Start the server
 // ------------------------------------------------------------
-// Only bind a port when run directly (e.
+// Only bind a port when run directly (e.g. `node server.js` locally,
+// or on Render/Railway). Serverless platforms like Vercel import this
+// file as a request handler instead, via `module.exports = app`.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log("============================================");
+    console.log("  AntarMan | अंतर्मन  —  Your Inner Voice");
+    console.log(`  Server running at: http://localhost:${PORT}`);
+    console.log("============================================");
+  });
+}
+
+module.exports = app;

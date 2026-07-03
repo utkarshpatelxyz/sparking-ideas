@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="ANTARMAN AI — Your inner voice. An empathetic, multilingual AI companion for India." />
-  <meta name="theme-color" content="#fcfcfa" />
+  <meta name="theme-color" content="#0e0e0d" />
   <title>ANTARMAN AI — Your inner voice</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,122 +17,118 @@
 </head>
 
 <body>
-  <!-- Ambient warm glow behind everything -->
   <div class="ambient" aria-hidden="true"></div>
 
-  <div class="app" id="app">
-    <!-- ============================================================ -->
-    <!-- SIDEBAR                                                      -->
-    <!-- ============================================================ -->
+  <div class="app is-empty" id="app">
+    <!-- ============================ SIDEBAR ============================ -->
     <aside class="sidebar" id="sidebar" aria-label="Conversations">
-      <div class="sidebar__top">
+      <div class="sidebar__head">
         <a class="brand" href="#" id="brand-home" aria-label="ANTARMAN AI home">
           <img
             src="antarman-logo.svg"
             alt="ANTARMAN"
             class="brand__img"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+            onerror="if(!this.dataset.p){this.dataset.p='1';this.src='antarman-logo.png';}else{this.style.display='none';this.nextElementSibling.style.display='inline-flex';}"
           />
-          <span class="brand__text" style="display:none;">ANTARMAN</span>
+          <span class="brand__wordmark" style="display:none;">ANTARMAN</span>
           <span class="brand__ai">AI</span>
         </a>
         <button class="icon-btn sidebar__collapse" id="collapse-btn" type="button" aria-label="Collapse sidebar" title="Collapse sidebar">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16"/></svg>
         </button>
       </div>
 
-      <button class="new-chat" id="new-chat-btn" type="button">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-        <span>New chat</span>
-      </button>
-
-      <div class="search">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="text" id="search-input" placeholder="Search chats" aria-label="Search chats" autocomplete="off" />
-      </div>
-
-      <nav class="history" id="history" aria-label="Chat history">
-        <!-- history groups injected by script.js -->
+      <nav class="nav">
+        <button class="nav-row nav-row--accent" id="new-chat-btn" type="button">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <span>New chat</span>
+        </button>
+        <div class="nav-row nav-row--search">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="search-input" placeholder="Search chats" aria-label="Search chats" autocomplete="off" />
+        </div>
       </nav>
 
-      <div class="sidebar__footer">
-        <button class="footer-row" id="settings-btn" type="button">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span>Settings</span>
-        </button>
-        <div class="footer-row account">
+      <div class="recent">
+        <div class="recent__label">Recent</div>
+        <nav class="history" id="history" aria-label="Chat history"></nav>
+      </div>
+
+      <div class="sidebar__foot">
+        <div class="profile">
           <span class="avatar" aria-hidden="true">अ</span>
-          <span class="account__name">You</span>
+          <div class="profile__meta">
+            <span class="profile__name">You</span>
+            <span class="profile__sub">AntarMan companion</span>
+          </div>
+          <button class="icon-btn" id="settings-btn" type="button" aria-label="Settings" title="Settings">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
         </div>
       </div>
     </aside>
 
-    <!-- Mobile / collapse backdrop -->
     <div class="scrim" id="scrim" aria-hidden="true"></div>
 
-    <!-- ============================================================ -->
-    <!-- MAIN                                                         -->
-    <!-- ============================================================ -->
+    <!-- ============================ MAIN ============================ -->
     <main class="main">
       <header class="topbar">
         <button class="icon-btn topbar__menu" id="menu-btn" type="button" aria-label="Open sidebar">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <h1 class="topbar__title" id="conv-title" title="Rename conversation">New chat</h1>
+        <h1 class="topbar__title" id="conv-title" title="Rename conversation">AntarMan</h1>
         <div class="topbar__spacer"></div>
-        <button class="icon-btn topbar__new" id="topbar-new" type="button" aria-label="New chat" title="New chat">
-          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        <button class="icon-btn" id="topbar-new" type="button" aria-label="New chat" title="New chat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
         </button>
       </header>
 
-      <div class="thread" id="thread">
-        <!-- Empty state -->
-        <section class="empty" id="empty-state">
-          <div class="empty__mark">
-            <img
-              src="antarman-logo.svg"
-              alt="ANTARMAN"
-              class="empty__logo"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
-            />
-            <span class="empty__wordmark" style="display:none;">ANTARMAN <span class="empty__ai">AI</span></span>
-          </div>
-          <p class="empty__tagline">Your inner voice · आपकी आंतरिक आवाज़</p>
-          <h2 class="empty__greeting" id="empty-greeting">How can I steady your mind today?</h2>
+      <div class="stage" id="stage">
+        <!-- Empty-state hero (Gemini-style centered) -->
+        <section class="hero" id="hero">
+          <h2 class="hero__greeting" id="hero-greeting">What should we focus on?</h2>
+        </section>
+
+        <!-- Conversation messages -->
+        <div class="messages" id="messages"></div>
+
+        <!-- Composer (centered when empty, docked bottom when chatting) -->
+        <div class="composer-dock">
+          <form class="composer" id="composer" autocomplete="off">
+            <textarea
+              id="input"
+              class="composer__input"
+              rows="1"
+              maxlength="8000"
+              placeholder="Ask AntarMan…  /  अपने मन की बात लिखिए…"
+              aria-label="Message AntarMan"
+            ></textarea>
+            <div class="composer__bar">
+              <span class="model-pill" id="model-pill" title="Active model">
+                <span class="model-pill__dot" aria-hidden="true"></span>
+                <span id="model-pill-label">AntarMan</span>
+              </span>
+              <div class="composer__grow"></div>
+              <button class="send" id="send-btn" type="submit" aria-label="Send message" disabled>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+              </button>
+            </div>
+          </form>
+
           <div class="chips" id="suggestion-chips">
             <button class="chip" type="button">Make a study plan for UPSC prep</button>
             <button class="chip" type="button">Explain compound interest simply</button>
             <button class="chip" type="button">मुझे थोड़ी प्रेरणा चाहिए</button>
             <button class="chip" type="button">Draft a polite leave email</button>
           </div>
-        </section>
 
-        <!-- messages injected by script.js -->
-        <div class="messages" id="messages"></div>
-      </div>
-
-      <div class="composer-wrap">
-        <form class="composer" id="composer" autocomplete="off">
-          <textarea
-            id="input"
-            class="composer__input"
-            rows="1"
-            maxlength="8000"
-            placeholder="Message ANTARMAN AI…  /  अपने मन की बात लिखिए…"
-            aria-label="Message ANTARMAN AI"
-          ></textarea>
-          <button class="send" id="send-btn" type="submit" aria-label="Send message" disabled>
-            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
-          </button>
-        </form>
-        <p class="disclaimer">AntarMan can make mistakes — for important decisions, please consult a professional.</p>
+          <p class="disclaimer">AntarMan can make mistakes — for important decisions, please consult a professional.</p>
+        </div>
       </div>
     </main>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- SETTINGS PANEL                                               -->
-  <!-- ============================================================ -->
+  <!-- ============================ SETTINGS ============================ -->
   <div class="panel-scrim" id="panel-scrim" aria-hidden="true"></div>
   <aside class="panel" id="settings-panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" aria-hidden="true">
     <div class="panel__head">
@@ -141,7 +137,6 @@
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
-
     <div class="panel__body">
       <div class="field">
         <label class="field__label">Theme</label>
@@ -151,7 +146,6 @@
           <button type="button" data-theme-value="system">System</button>
         </div>
       </div>
-
       <div class="field">
         <label class="field__label">Reply language</label>
         <div class="segmented" id="lang-seg" role="group" aria-label="Reply language">
@@ -162,7 +156,6 @@
         </div>
         <p class="field__hint">AntarMan auto-detects your language. This is a gentle preference.</p>
       </div>
-
       <div class="field">
         <label class="field__label">Text size</label>
         <div class="segmented" id="size-seg" role="group" aria-label="Text size">
@@ -170,11 +163,9 @@
           <button type="button" data-size-value="compact">Compact</button>
         </div>
       </div>
-
       <div class="field">
         <button class="danger-btn" id="clear-all-btn" type="button">Clear all conversations</button>
       </div>
-
       <div class="about">
         <p><strong>ANTARMAN AI</strong> — अंतर्मन, your inner voice. An empathetic companion that speaks English, Hindi and Hinglish.</p>
         <p class="about__safe">If you are in distress, please reach a professional. India — KIRAN helpline <strong>1800-599-0019</strong> · Emergency <strong>112</strong>.</p>
@@ -182,7 +173,7 @@
     </div>
   </aside>
 
-  <!-- Lightweight confirm dialog -->
+  <!-- ============================ CONFIRM ============================ -->
   <div class="confirm-scrim" id="confirm-scrim" aria-hidden="true">
     <div class="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-text">
       <p id="confirm-text">Are you sure?</p>

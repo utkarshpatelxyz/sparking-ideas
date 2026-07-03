@@ -19,15 +19,14 @@ const sidebar = document.getElementById("sidebar");
 const scrim = document.getElementById("scrim");
 const historyEl = document.getElementById("history");
 const searchInput = document.getElementById("search-input");
-const threadEl = document.getElementById("thread");
 const messagesEl = document.getElementById("messages");
-const emptyState = document.getElementById("empty-state");
-const emptyGreeting = document.getElementById("empty-greeting");
+const heroGreeting = document.getElementById("hero-greeting");
 const chipsWrap = document.getElementById("suggestion-chips");
 const composer = document.getElementById("composer");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("send-btn");
 const convTitle = document.getElementById("conv-title");
+const modelPillLabel = document.getElementById("model-pill-label");
 
 const newChatBtn = document.getElementById("new-chat-btn");
 const topbarNew = document.getElementById("topbar-new");
@@ -51,9 +50,9 @@ const confirmCancel = document.getElementById("confirm-cancel");
 /* ---------- Constants ---------- */
 const STORAGE_KEY = "antarman.v2";
 const GREETINGS = [
-  "How can I steady your mind today?",
-  "Aaj aapke mann mein kya chal raha hai?",
-  "What would you like to think through?",
+  "What should we focus on?",
+  "Aaj hum kis par dhyaan dein?",
+  "What's on your mind today?",
   "मैं आपकी किस बात में मदद करूँ?",
 ];
 const GENERIC_ERROR =
@@ -122,7 +121,7 @@ function prefersReduced() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 function scrollToBottom() {
-  threadEl.scrollTo({ top: threadEl.scrollHeight, behavior: prefersReduced() ? "auto" : "smooth" });
+  messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: prefersReduced() ? "auto" : "smooth" });
 }
 
 /* ============================================================
@@ -309,11 +308,11 @@ function copyText(text, btn) {
    THREAD + EMPTY STATE
    ============================================================ */
 function showEmpty() {
-  emptyGreeting.textContent = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
-  emptyState.classList.remove("hidden");
+  heroGreeting.textContent = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+  app.classList.add("is-empty");
 }
 function hideEmpty() {
-  emptyState.classList.add("hidden");
+  app.classList.remove("is-empty");
 }
 function renderThread() {
   messagesEl.innerHTML = "";
@@ -770,6 +769,33 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ============================================================
+   MODEL PILL (from /api/health) — informational only
+   ============================================================ */
+function prettyModel(name) {
+  if (!name) return "AntarMan";
+  const n = String(name).toLowerCase();
+  if (n.includes("llama-3.3-70b")) return "Llama 3.3 70B";
+  if (n.includes("llama-3.1-8b")) return "Llama 3.1 8B";
+  if (n.includes("qwen3-32b")) return "Qwen3 32B";
+  if (n.includes("gemini")) return "Gemini";
+  // Fall back to a tidy version of the raw id.
+  return name.split("/").pop();
+}
+async function loadModelPill() {
+  try {
+    const res = await fetch("/api/health");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.model) {
+      modelPillLabel.textContent = prettyModel(data.model);
+      modelPillLabel.parentElement.title = "Model: " + data.model + " · Provider: " + (data.provider || "");
+    }
+  } catch (e) {
+    /* keep the default "AntarMan" label */
+  }
+}
+
+/* ============================================================
    INIT
    ============================================================ */
 function init() {
@@ -780,6 +806,7 @@ function init() {
   updateTitle();
   autoResize();
   updateSendState();
+  loadModelPill();
   if (!isMobile()) input.focus();
 }
 init();

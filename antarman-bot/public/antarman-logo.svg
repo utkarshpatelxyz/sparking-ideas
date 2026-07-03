@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 88" role="img" aria-label="ANTARMAN">
-  <!-- Placeholder wordmark. Replace this file with the real ANTARMAN logo
-       (keep the same filename: antarman-logo.svg) and it appears everywhere. -->
-  <text x="250" y="66" text-anchor="middle" textLength="480" lengthAdjust="spacingAndGlyphs"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 84" role="img" aria-label="ANTARMAN">
+  <!-- Placeholder wordmark. Replace this file (keep the name antarman-logo.svg)
+       or drop antarman-logo.png into /public to use your real ANTARMAN logo. -->
+  <text x="230" y="62" text-anchor="middle" textLength="450" lengthAdjust="spacingAndGlyphs"
         font-family="system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-        font-size="72" font-weight="800" letter-spacing="2" fill="#17160F">ANTARMAN</text>
+        font-size="66" font-weight="800" letter-spacing="3" fill="#17160F">ANTARMAN</text>
 </svg>

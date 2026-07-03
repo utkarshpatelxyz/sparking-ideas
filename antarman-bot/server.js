@@ -95,7 +95,7 @@ emergencies:
 // ------------------------------------------------------------
 // Gemini SDK setup
 // ------------------------------------------------------------
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI("AQ.Ab8RN6LUK5Zvg2-Bo1wrMXWQlQmNFGwdH1rLtNm8wbyIJmcAtw");
 const model = genAI.getGenerativeModel({
   model: "gemini-2.5-flash",
   systemInstruction: ANTARMAN_SYSTEM_INSTRUCTION,

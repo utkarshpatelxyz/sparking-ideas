@@ -272,10 +272,43 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "ok",
     service: "AntarMan",
-    version: "2.1.0",
+    version: "2.2.0",
     model: GEMINI_MODEL,
     keyConfigured: Boolean(GEMINI_API_KEY),
   });
+});
+
+// ------------------------------------------------------------
+// TEMPORARY DEBUG endpoint — remove once chat is confirmed working.
+// Calls Google directly and reports which key is live (first chars
+// only) plus the exact upstream status and body, so quota/auth issues
+// are unambiguous. Always returns 200 so it renders in a browser.
+// ------------------------------------------------------------
+app.get("/api/diag", async (req, res) => {
+  const info = {
+    version: "2.2.0",
+    model: GEMINI_MODEL,
+    keyConfigured: Boolean(GEMINI_API_KEY),
+    keyPrefix: GEMINI_API_KEY ? GEMINI_API_KEY.slice(0, 5) + "…" : null,
+    keyLength: GEMINI_API_KEY ? GEMINI_API_KEY.length : 0,
+  };
+  if (!GEMINI_API_KEY) {
+    return res.status(200).json({ ...info, note: "GEMINI_API_KEY is not set on the server." });
+  }
+  try {
+    const r = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
+        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "ping" }] }] }),
+      }
+    );
+    const text = await r.text();
+    return res.status(200).json({ ...info, upstreamStatus: r.status, upstreamBody: text.slice(0, 1200) });
+  } catch (e) {
+    return res.status(200).json({ ...info, fetchError: String((e && e.message) || e) });
+  }
 });
 
 // ------------------------------------------------------------

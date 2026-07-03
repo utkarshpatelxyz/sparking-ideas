@@ -2,135 +2,196 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="AntarMan (अंतर्मन) — Your Inner Voice. An empathetic AI companion for India." />
-  <title>AntarMan | अंतर्मन — Your Inner Voice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="ANTARMAN AI — Your inner voice. An empathetic, multilingual AI companion for India." />
+  <meta name="theme-color" content="#fcfcfa" />
+  <title>ANTARMAN AI — Your inner voice</title>
 
-  <!-- Google Fonts: Plus Jakarta Sans (Latin) + Noto Sans Devanagari (Hindi) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet"
   />
-
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'system-ui', 'sans-serif'],
-          },
-          colors: {
-            ember: {
-              400: '#fbbf24',
-              500: '#f59e0b',
-              600: '#d97706',
-            },
-            maroon: {
-              700: '#7f1d1d',
-              800: '#6b1a1a',
-              900: '#450a0a',
-            },
-          },
-        },
-      },
-    };
-  </script>
-
-  <!-- Custom overrides & micro-interactions -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body class="bg-neutral-950 text-neutral-200 font-sans antialiased h-screen flex flex-col overflow-hidden">
+<body>
+  <!-- Ambient warm glow behind everything -->
+  <div class="ambient" aria-hidden="true"></div>
 
-  <!-- ============================================ -->
-  <!-- TOP HEADER BAR                               -->
-  <!-- ============================================ -->
-  <header class="shrink-0 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-md z-20">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3 min-w-0">
-        <!-- Logo mark -->
-        <div class="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-red-900 flex items-center justify-center shadow-lg shadow-amber-900/30 ring-1 ring-amber-500/40">
-          <span class="text-xl select-none" aria-hidden="true">🪔</span>
+  <div class="app" id="app">
+    <!-- ============================================================ -->
+    <!-- SIDEBAR                                                      -->
+    <!-- ============================================================ -->
+    <aside class="sidebar" id="sidebar" aria-label="Conversations">
+      <div class="sidebar__top">
+        <a class="brand" href="#" id="brand-home" aria-label="ANTARMAN AI home">
+          <img
+            src="antarman-logo.svg"
+            alt="ANTARMAN"
+            class="brand__img"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+          />
+          <span class="brand__text" style="display:none;">ANTARMAN</span>
+          <span class="brand__ai">AI</span>
+        </a>
+        <button class="icon-btn sidebar__collapse" id="collapse-btn" type="button" aria-label="Collapse sidebar" title="Collapse sidebar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+      </div>
+
+      <button class="new-chat" id="new-chat-btn" type="button">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span>New chat</span>
+      </button>
+
+      <div class="search">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="search-input" placeholder="Search chats" aria-label="Search chats" autocomplete="off" />
+      </div>
+
+      <nav class="history" id="history" aria-label="Chat history">
+        <!-- history groups injected by script.js -->
+      </nav>
+
+      <div class="sidebar__footer">
+        <button class="footer-row" id="settings-btn" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+        <div class="footer-row account">
+          <span class="avatar" aria-hidden="true">अ</span>
+          <span class="account__name">You</span>
         </div>
-        <div class="min-w-0">
-          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-neutral-50 truncate">
-            AntarMan <span class="text-amber-400">|</span> <span class="text-amber-300">अंतर्मन</span>
-          </h1>
-          <p class="text-xs text-neutral-400 truncate">
-            Your Inner Voice <span class="text-neutral-600">/</span> आपकी आंतरिक आवाज़
-          </p>
+      </div>
+    </aside>
+
+    <!-- Mobile / collapse backdrop -->
+    <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+    <!-- ============================================================ -->
+    <!-- MAIN                                                         -->
+    <!-- ============================================================ -->
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn topbar__menu" id="menu-btn" type="button" aria-label="Open sidebar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <h1 class="topbar__title" id="conv-title" title="Rename conversation">New chat</h1>
+        <div class="topbar__spacer"></div>
+        <button class="icon-btn topbar__new" id="topbar-new" type="button" aria-label="New chat" title="New chat">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+      </header>
+
+      <div class="thread" id="thread">
+        <!-- Empty state -->
+        <section class="empty" id="empty-state">
+          <div class="empty__mark">
+            <img
+              src="antarman-logo.svg"
+              alt="ANTARMAN"
+              class="empty__logo"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+            />
+            <span class="empty__wordmark" style="display:none;">ANTARMAN <span class="empty__ai">AI</span></span>
+          </div>
+          <p class="empty__tagline">Your inner voice · आपकी आंतरिक आवाज़</p>
+          <h2 class="empty__greeting" id="empty-greeting">How can I steady your mind today?</h2>
+          <div class="chips" id="suggestion-chips">
+            <button class="chip" type="button">Make a study plan for UPSC prep</button>
+            <button class="chip" type="button">Explain compound interest simply</button>
+            <button class="chip" type="button">मुझे थोड़ी प्रेरणा चाहिए</button>
+            <button class="chip" type="button">Draft a polite leave email</button>
+          </div>
+        </section>
+
+        <!-- messages injected by script.js -->
+        <div class="messages" id="messages"></div>
+      </div>
+
+      <div class="composer-wrap">
+        <form class="composer" id="composer" autocomplete="off">
+          <textarea
+            id="input"
+            class="composer__input"
+            rows="1"
+            maxlength="8000"
+            placeholder="Message ANTARMAN AI…  /  अपने मन की बात लिखिए…"
+            aria-label="Message ANTARMAN AI"
+          ></textarea>
+          <button class="send" id="send-btn" type="submit" aria-label="Send message" disabled>
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          </button>
+        </form>
+        <p class="disclaimer">AntarMan can make mistakes — for important decisions, please consult a professional.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SETTINGS PANEL                                               -->
+  <!-- ============================================================ -->
+  <div class="panel-scrim" id="panel-scrim" aria-hidden="true"></div>
+  <aside class="panel" id="settings-panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" aria-hidden="true">
+    <div class="panel__head">
+      <h2 id="panel-title">Settings</h2>
+      <button class="icon-btn" id="panel-close" type="button" aria-label="Close settings">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="panel__body">
+      <div class="field">
+        <label class="field__label">Theme</label>
+        <div class="segmented" id="theme-seg" role="group" aria-label="Theme">
+          <button type="button" data-theme-value="light">Light</button>
+          <button type="button" data-theme-value="dark">Dark</button>
+          <button type="button" data-theme-value="system">System</button>
         </div>
       </div>
 
-      <!-- Clear Conversation History button -->
-      <button
-        id="clear-btn"
-        type="button"
-        class="glow-btn shrink-0 inline-flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/70 px-3 py-2 text-xs sm:text-sm font-semibold text-neutral-300 transition-all duration-200 hover:border-amber-500/60 hover:text-amber-300 hover:bg-neutral-800 focus:outline-none"
-        title="Clear Conversation History"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-        <span class="hidden sm:inline">Clear Conversation History</span>
-        <span class="sm:hidden">Clear</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ============================================ -->
-  <!-- CHAT HISTORY DISPLAY AREA                    -->
-  <!-- ============================================ -->
-  <main
-    id="chat-container"
-    class="flex-1 overflow-y-auto scroll-smooth"
-    aria-live="polite"
-  >
-    <div id="chat-list" class="max-w-4xl mx-auto px-4 py-6 flex flex-col gap-4">
-      <!-- Welcome message (rendered on load & after clearing, from script.js) -->
-    </div>
-  </main>
-
-  <!-- ============================================ -->
-  <!-- STICKY BOTTOM INPUT BAR                      -->
-  <!-- ============================================ -->
-  <footer class="shrink-0 sticky bottom-0 border-t border-neutral-800 bg-neutral-900/90 backdrop-blur-md z-20">
-    <div class="max-w-4xl mx-auto px-4 py-3">
-      <form id="chat-form" class="flex items-end gap-3" autocomplete="off">
-        <div class="relative flex-1">
-          <textarea
-            id="user-input"
-            rows="1"
-            maxlength="8000"
-            placeholder="Apne mann ki baat likhiye… / अपने मन की बात लिखिए… / Type your message…"
-            class="glow-input w-full resize-none rounded-xl border border-neutral-700 bg-neutral-800/80 px-4 py-3 pr-4 text-sm sm:text-base text-neutral-100 placeholder-neutral-500 outline-none transition-all duration-200"
-            aria-label="Message input"
-          ></textarea>
+      <div class="field">
+        <label class="field__label">Reply language</label>
+        <div class="segmented" id="lang-seg" role="group" aria-label="Reply language">
+          <button type="button" data-lang-value="auto">Auto</button>
+          <button type="button" data-lang-value="english">English</button>
+          <button type="button" data-lang-value="hindi">हिंदी</button>
+          <button type="button" data-lang-value="hinglish">Hinglish</button>
         </div>
-        <button
-          id="send-btn"
-          type="submit"
-          class="glow-btn send-btn shrink-0 inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-amber-500 to-red-900 px-4 sm:px-5 py-3 text-sm sm:text-base font-bold text-neutral-950 transition-all duration-200 hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:brightness-100 focus:outline-none"
-          aria-label="Send message"
-        >
-          <span class="hidden sm:inline">Send</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-          </svg>
-        </button>
-      </form>
-      <p class="mt-2 text-center text-[11px] text-neutral-600">
-        AntarMan ek AI saathi hai — mahatvapurna faislon ke liye kripya visheshagyon se salah lein.
-        <span class="text-neutral-700">|</span>
-        Press <kbd class="rounded border border-neutral-700 bg-neutral-800 px-1 text-neutral-400">Enter</kbd> to send,
-        <kbd class="rounded border border-neutral-700 bg-neutral-800 px-1 text-neutral-400">Shift+Enter</kbd> for a new line.
-      </p>
+        <p class="field__hint">AntarMan auto-detects your language. This is a gentle preference.</p>
+      </div>
+
+      <div class="field">
+        <label class="field__label">Text size</label>
+        <div class="segmented" id="size-seg" role="group" aria-label="Text size">
+          <button type="button" data-size-value="comfortable">Comfortable</button>
+          <button type="button" data-size-value="compact">Compact</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <button class="danger-btn" id="clear-all-btn" type="button">Clear all conversations</button>
+      </div>
+
+      <div class="about">
+        <p><strong>ANTARMAN AI</strong> — अंतर्मन, your inner voice. An empathetic companion that speaks English, Hindi and Hinglish.</p>
+        <p class="about__safe">If you are in distress, please reach a professional. India — KIRAN helpline <strong>1800-599-0019</strong> · Emergency <strong>112</strong>.</p>
+      </div>
     </div>
-  </footer>
+  </aside>
+
+  <!-- Lightweight confirm dialog -->
+  <div class="confirm-scrim" id="confirm-scrim" aria-hidden="true">
+    <div class="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-text">
+      <p id="confirm-text">Are you sure?</p>
+      <div class="confirm__actions">
+        <button class="btn-ghost" id="confirm-cancel" type="button">Cancel</button>
+        <button class="btn-danger" id="confirm-ok" type="button">Delete</button>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

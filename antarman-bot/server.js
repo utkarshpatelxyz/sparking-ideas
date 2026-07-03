@@ -152,7 +152,34 @@ function friendlyError(status, bodyText) {
     );
   }
   if (status === 429) {
-    return "The free quota is exhausted right now (429). Please wait a little and try again.";
+    // Surface which quota tripped and the suggested retry delay, so a
+    // temporary rate limit is distinguishable from a project with zero quota.
+    let detail = "";
+    try {
+      const parsed = JSON.parse(bodyText);
+      const details = (parsed.error && parsed.error.details) || [];
+      for (const d of details) {
+        if (d["@type"] && d["@type"].includes("QuotaFailure") && Array.isArray(d.violations)) {
+          const v = d.violations[0] || {};
+          if (v.quotaId || v.quotaMetric) {
+            detail += " Quota: " + (v.quotaId || v.quotaMetric);
+            if (v.quotaValue !== undefined) detail += " (limit " + v.quotaValue + ")";
+            detail += ".";
+          }
+        }
+        if (d["@type"] && d["@type"].includes("RetryInfo") && d.retryDelay) {
+          detail += " Retry in " + d.retryDelay + ".";
+        }
+      }
+    } catch (e) {
+      /* body wasn't JSON — keep the generic message */
+    }
+    return (
+      "Rate limit reached (429)." + (detail || " Please wait a little and try again.") +
+      (detail.indexOf("limit 0") !== -1
+        ? " A limit of 0 means this Google Cloud project has no free-tier quota for this model — enable billing on the project or use a key from a personal AI Studio account."
+        : "")
+    );
   }
   return "The AI service returned an error (HTTP " + status + "). Please try again shortly.";
 }

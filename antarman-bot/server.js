@@ -114,4 +114,81 @@ function buildSafeHistory(rawHistory) {
 // ------------------------------------------------------------
 app.post("/api/chat", async (req, res) => {
   try {
-    const { message, history } = req
+    const { message, history } = req.body || {};
+
+    if (typeof message !== "string" || !message.trim()) {
+      return res.status(400).json({ error: "A non-empty 'message' string is required." });
+    }
+
+    const trimmedMessage = message.trim().slice(0, 8000);
+    const safeHistory = buildSafeHistory(history);
+
+    // 1. Construct the exact JSON payload the Google REST API expects
+    const payload = {
+      systemInstruction: {
+        parts: [{ text: ANTARMAN_SYSTEM_INSTRUCTION }]
+      },
+      contents: [
+        ...safeHistory,
+        { role: "user", parts: [{ text: trimmedMessage }] }
+      ],
+      generationConfig: {
+        temperature: 0.8,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 2048,
+      }
+    };
+
+    // 2. Fire directly at the endpoint, passing the key in the URL
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("[AntarMan] Native Fetch API Error:", response.status, errText);
+      throw new Error(`API returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // 3. Extract the text directly from the JSON response
+    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    if (!responseText) {
+      throw new Error("Received empty text array from Google");
+    }
+
+    return res.status(200).json({ reply: responseText });
+    
+  } catch (error) {
+    console.error("[AntarMan] Server Error:", error.message || error);
+    return res.status(500).json({
+      error:
+        "Kshama kijiye 🙏 — AntarMan abhi thoda vishram kar raha hai. " +
+        "(Apologies — AntarMan is resting for a moment. This can happen if the " +
+        "free API quota is briefly exceeded or the key is invalid. " +
+        "Please try again in a few seconds.)",
+    });
+  }
+});
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", service: "AntarMan Native", model: "gemini-2.0-flash" });
+});
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log("============================================");
+    console.log("  AntarMan | अंतर्मन  —  Your Inner Voice (Native)");
+    console.log(`  Server running at: http://localhost:${PORT}`);
+    console.log("============================================");
+  });
+}
+
+module.exports = app;

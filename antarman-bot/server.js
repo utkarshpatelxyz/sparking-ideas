@@ -1,10 +1,10 @@
 /**
  * ============================================================
- *   AntarMan (अंतर्मन) — Secure Backend Proxy Server
+ * AntarMan (अंतर्मन) — Secure Backend Proxy Server
  * ============================================================
- *   This server keeps the Gemini API key safely on the server
- *   side and exposes a single POST /api/chat endpoint that the
- *   frontend talks to. The frontend never sees the API key.
+ * This server keeps the Gemini API key safely on the server
+ * side and exposes a single POST /api/chat endpoint that the
+ * frontend talks to. The frontend never sees the API key.
  * ============================================================
  */
 
@@ -77,7 +77,7 @@ the mind rather than overwhelming it.
 == SAFETY REDLINES ==
 If the user asks about self-harm, suicidal thoughts, legal problems, or medical
 emergencies:
-- Respond with warmth, compassion, and complete seriousness.
+- Respond with warmth, compassionate, and complete seriousness.
 - Explicitly state that you are an AI companion and not a substitute for a
   qualified professional.
 - Strongly and gently recommend seeking real human professional help
@@ -95,9 +95,9 @@ emergencies:
 // ------------------------------------------------------------
 // Gemini SDK setup
 // ------------------------------------------------------------
-const genAI = new GoogleGenerativeAI("AQ.Ab8RN6LUK5Zvg2-Bo1wrMXWQlQmNFGwdH1rLtNm8wbyIJmcAtw");
+const genAI = new GoogleGenerativeAI("AQ.Ab8RN6JH2i0mq2kBM5Spt0YZElZqYFb5H6Qk6dNcDwR86BtI7A");
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
+  model: "gemini-2.0-flash",
   systemInstruction: ANTARMAN_SYSTEM_INSTRUCTION,
   generationConfig: {
     temperature: 0.8,
@@ -110,7 +110,7 @@ const model = genAI.getGenerativeModel({
 /**
  * Sanitizes and normalizes the chat history array sent by the frontend
  * into the exact shape the Gemini SDK expects:
- *    [{ role: "user" | "model", parts: [{ text: "..." }] }, ...]
+ * [{ role: "user" | "model", parts: [{ text: "..." }] }, ...]
  *
  * Any malformed entries are silently dropped so a corrupted client
  * payload can never crash the model call.
@@ -192,22 +192,10 @@ app.post("/api/chat", async (req, res) => {
 // Health check endpoint (useful for Render/Railway deployments)
 // ------------------------------------------------------------
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", service: "AntarMan", model: "gemini-2.5-flash" });
+  res.status(200).json({ status: "ok", service: "AntarMan", model: "gemini-2.0-flash" });
 });
 
 // ------------------------------------------------------------
 // Start the server
 // ------------------------------------------------------------
-// Only bind a port when run directly (e.g. `node server.js` locally,
-// or on Render/Railway). Serverless platforms like Vercel import this
-// file as a request handler instead, via `module.exports = app`.
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log("============================================");
-    console.log("  AntarMan | अंतर्मन  —  Your Inner Voice");
-    console.log(`  Server running at: http://localhost:${PORT}`);
-    console.log("============================================");
-  });
-}
-
-module.exports = app;
+// Only bind a port when run directly (e.

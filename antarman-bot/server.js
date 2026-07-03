@@ -1,9 +1,11 @@
 /**
  * ============================================================
- * AntarMan (अंतर्मन) — Secure Backend Proxy Server
+ *  AntarMan (अंतर्मन) — Secure Backend Proxy Server
  * ============================================================
- * This version completely removes the Google SDK to bypass 
- * all token formatting errors, utilizing native Node fetch.
+ *  Keeps the Gemini API key on the server and exposes POST
+ *  /api/chat to the frontend. Uses native fetch (no SDK), which
+ *  is serverless-friendly on Vercel. Runs as a normal server
+ *  locally / on Render, and is exported for Vercel functions.
  * ============================================================
  */
 
@@ -12,12 +14,24 @@ const dotenv = require("dotenv");
 const express = require("express");
 const cors = require("cors");
 
-// Load environment variables
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-// Using the correct AQ. key (removed the accidental "NAME" typo from the end)
-const GEMINI_API_KEY = "AQ.Ab8RN6LzYFBoaXggyLifEY3r4l3u8arVxkscu55Ozk6h2dfDWw";
+
+// The API key lives ONLY in the environment — never hardcode it.
+// Get a valid Gemini API key at: https://aistudio.google.com/app/apikey
+// (It must be a standard Gemini "AIza…" key, NOT an OAuth/"AQ." token.)
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+// Model is configurable so it can be updated without a code change.
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+
+if (!GEMINI_API_KEY) {
+  console.warn(
+    "[AntarMan] WARNING: GEMINI_API_KEY is not set. /api/chat will return a " +
+      "configuration error until you add it to the environment."
+  );
+}
 
 // ------------------------------------------------------------
 // Express application setup
@@ -64,7 +78,7 @@ the mind rather than overwhelming it.
 == SAFETY REDLINES ==
 If the user asks about self-harm, suicidal thoughts, legal problems, or medical
 emergencies:
-- Respond with warmth, compassionate, and complete seriousness.
+- Respond with warmth, compassion, and complete seriousness.
 - Explicitly state that you are an AI companion and not a substitute for a
   qualified professional.
 - Strongly and gently recommend seeking real human professional help
@@ -80,12 +94,13 @@ emergencies:
 `.trim();
 
 /**
- * Sanitizes chat history for the native REST payload
+ * Normalizes the frontend history array into the shape the Gemini REST
+ * API expects: [{ role: "user" | "model", parts: [{ text }] }, ...].
+ * Malformed entries are dropped so a bad payload can never crash the call.
  */
 function buildSafeHistory(rawHistory) {
   if (!Array.isArray(rawHistory)) return [];
   const safe = [];
-  
   for (const entry of rawHistory) {
     if (!entry || typeof entry !== "object") continue;
     const role = entry.role === "model" ? "model" : entry.role === "user" ? "user" : null;
@@ -94,7 +109,11 @@ function buildSafeHistory(rawHistory) {
     let text = "";
     if (typeof entry.text === "string") {
       text = entry.text;
-    } else if (Array.isArray(entry.parts) && entry.parts.length > 0 && typeof entry.parts[0].text === "string") {
+    } else if (
+      Array.isArray(entry.parts) &&
+      entry.parts.length > 0 &&
+      typeof entry.parts[0].text === "string"
+    ) {
       text = entry.parts[0].text;
     }
 
@@ -102,20 +121,56 @@ function buildSafeHistory(rawHistory) {
     if (!text) continue;
     safe.push({ role, parts: [{ text }] });
   }
-
-  while (safe.length > 0 && safe[0].role !== "user") {
-    safe.shift();
-  }
+  // Gemini requires the history to start with a "user" turn.
+  while (safe.length > 0 && safe[0].role !== "user") safe.shift();
   return safe;
 }
 
+/**
+ * Maps a Google API HTTP error into a clear, actionable message.
+ * Returned to the client so misconfigurations are diagnosable in the UI.
+ */
+function friendlyError(status, bodyText) {
+  const t = (bodyText || "").toLowerCase();
+  if (status === 401 || t.includes("oauth 2 access token") || t.includes("unauthenticated")) {
+    return (
+      "AntarMan's server credential was rejected (401). The GEMINI_API_KEY is missing " +
+      "or is not a valid Gemini API key. Use a standard 'AIza…' key from " +
+      "Google AI Studio — an OAuth-style 'AQ.' token will not work here."
+    );
+  }
+  if (status === 400 && t.includes("api_key_invalid")) {
+    return "The Gemini API key is invalid (400). Please set a valid key in GEMINI_API_KEY.";
+  }
+  if (status === 403) {
+    return "Access denied (403) — the key may lack access to this model, or the Generative Language API isn't enabled for it.";
+  }
+  if (status === 404) {
+    return (
+      "The AI model '" + GEMINI_MODEL + "' was not found (404) — it may be retired. " +
+      "Set the GEMINI_MODEL env var to a current model (e.g. gemini-2.0-flash)."
+    );
+  }
+  if (status === 429) {
+    return "The free quota is exhausted right now (429). Please wait a little and try again.";
+  }
+  return "The AI service returned an error (HTTP " + status + "). Please try again shortly.";
+}
+
 // ------------------------------------------------------------
-// POST /api/chat — using Native Node fetch instead of SDK
+// POST /api/chat — main conversation endpoint
 // ------------------------------------------------------------
 app.post("/api/chat", async (req, res) => {
   try {
-    const { message, history } = req.body || {};
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({
+        error:
+          "Server is missing GEMINI_API_KEY. Add a valid Gemini API key in the " +
+          "hosting environment (e.g. Vercel → Settings → Environment Variables), then redeploy.",
+      });
+    }
 
+    const { message, history } = req.body || {};
     if (typeof message !== "string" || !message.trim()) {
       return res.status(400).json({ error: "A non-empty 'message' string is required." });
     }
@@ -123,73 +178,87 @@ app.post("/api/chat", async (req, res) => {
     const trimmedMessage = message.trim().slice(0, 8000);
     const safeHistory = buildSafeHistory(history);
 
-    // 1. Construct the exact JSON payload the Google REST API expects
     const payload = {
-      systemInstruction: {
-        parts: [{ text: ANTARMAN_SYSTEM_INSTRUCTION }]
-      },
-      contents: [
-        ...safeHistory,
-        { role: "user", parts: [{ text: trimmedMessage }] }
-      ],
-      generationConfig: {
-        temperature: 0.8,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 2048,
-      }
+      systemInstruction: { parts: [{ text: ANTARMAN_SYSTEM_INSTRUCTION }] },
+      contents: [...safeHistory, { role: "user", parts: [{ text: trimmedMessage }] }],
+      generationConfig: { temperature: 0.8, topP: 0.95, topK: 40, maxOutputTokens: 2048 },
     };
 
-    // 2. Fire directly at the active Gemini 3.5 Flash endpoint
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent`;
-    
-    // 3. Inject the AQ. key as a Bearer Token in the Authorization header
+    // Canonical Gemini REST auth: the API key goes in the x-goog-api-key header.
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/" +
+      GEMINI_MODEL +
+      ":generateContent";
+
     const response = await fetch(url, {
       method: "POST",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GEMINI_API_KEY}`
+        "x-goog-api-key": GEMINI_API_KEY,
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("[AntarMan] Native Fetch API Error:", response.status, errText);
-      throw new Error(`API returned ${response.status}`);
+      console.error("[AntarMan] Gemini API error:", response.status, errText.slice(0, 600));
+      return res.status(502).json({ error: friendlyError(response.status, errText) });
     }
 
     const data = await response.json();
-    
-    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const responseText =
+      data &&
+      data.candidates &&
+      data.candidates[0] &&
+      data.candidates[0].content &&
+      data.candidates[0].content.parts &&
+      data.candidates[0].content.parts[0] &&
+      data.candidates[0].content.parts[0].text;
 
     if (!responseText) {
-      throw new Error("Received empty text array from Google");
+      const blockReason =
+        (data && data.promptFeedback && data.promptFeedback.blockReason) ||
+        (data && data.candidates && data.candidates[0] && data.candidates[0].finishReason);
+      console.error("[AntarMan] Empty candidate:", JSON.stringify(data).slice(0, 600));
+      return res.status(502).json({
+        error: blockReason
+          ? "AntarMan couldn't respond to that (" + blockReason + "). Please try rephrasing."
+          : "AntarMan received an empty response. Please try again.",
+      });
     }
 
     return res.status(200).json({ reply: responseText });
-    
   } catch (error) {
-    console.error("[AntarMan] Server Error:", error.message || error);
+    console.error("[AntarMan] Server error:", error && error.message ? error.message : error);
     return res.status(500).json({
       error:
-        "Kshama kijiye 🙏 — AntarMan abhi thoda vishram kar raha hai. " +
-        "(Apologies — AntarMan is resting for a moment. This can happen if the " +
-        "free API quota is briefly exceeded or the key is invalid. " +
-        "Please try again in a few seconds.)",
+        "Kshama kijiye 🙏 — AntarMan tak pahunchne mein network samasya aa gayi. " +
+        "Kripya thodi der baad phir prayas kijiye.",
     });
   }
 });
 
+// ------------------------------------------------------------
+// Health check — reports config without leaking the key
+// ------------------------------------------------------------
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", service: "AntarMan Native", model: "gemini-3.5-flash" });
+  res.status(200).json({
+    status: "ok",
+    service: "AntarMan",
+    model: GEMINI_MODEL,
+    keyConfigured: Boolean(GEMINI_API_KEY),
+  });
 });
 
+// ------------------------------------------------------------
+// Start the server when run directly; export the app for Vercel.
+// ------------------------------------------------------------
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log("============================================");
-    console.log("  AntarMan | अंतर्मन  —  Your Inner Voice (Native)");
-    console.log(`  Server running at: http://localhost:${PORT}`);
+    console.log("  AntarMan | अंतर्मन  —  Your Inner Voice");
+    console.log("  Model: " + GEMINI_MODEL);
+    console.log("  Server running at: http://localhost:" + PORT);
     console.log("============================================");
   });
 }

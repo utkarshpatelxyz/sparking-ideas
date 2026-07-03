@@ -6,8 +6,5 @@
   ],
   "routes": [
     { "src": "/(.*)", "dest": "/server.js" }
-  ],
-  "env": {
-    "GEMINI_API_KEY": "AQ.Ab8RN6LUK5Zvg2-Bo1wrMXWQlQmNFGwdH1rLtNm8wbyIJmcAtw"
-  }
+  ]
 }

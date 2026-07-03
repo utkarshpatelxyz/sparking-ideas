@@ -245,6 +245,7 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "ok",
     service: "AntarMan",
+    version: "2.1.0",
     model: GEMINI_MODEL,
     keyConfigured: Boolean(GEMINI_API_KEY),
   });

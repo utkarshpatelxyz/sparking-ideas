@@ -16,7 +16,7 @@ const cors = require("cors");
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-// Using your hardcoded key directly
+// Using your hardcoded AQ. key
 const GEMINI_API_KEY = "AQ.Ab8RN6JH2i0mq2kBM5Spt0YZElZqYFb5H6Qk6dNcDwR86BtI7A";
 
 // ------------------------------------------------------------
@@ -140,12 +140,16 @@ app.post("/api/chat", async (req, res) => {
       }
     };
 
-    // 2. Fire directly at the endpoint, passing the key in the URL
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+    // 2. Fire directly at the active Gemini 3.5 Flash endpoint (Removed deprecated 2.0 URL)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent`;
     
+    // 3. Inject the AQ. key directly into the headers instead of the URL query string
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY
+      },
       body: JSON.stringify(payload)
     });
 
@@ -157,7 +161,6 @@ app.post("/api/chat", async (req, res) => {
 
     const data = await response.json();
     
-    // 3. Extract the text directly from the JSON response
     const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     if (!responseText) {
@@ -179,7 +182,7 @@ app.post("/api/chat", async (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", service: "AntarMan Native", model: "gemini-2.0-flash" });
+  res.status(200).json({ status: "ok", service: "AntarMan Native", model: "gemini-3.5-flash" });
 });
 
 if (require.main === module) {

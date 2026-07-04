@@ -3,9 +3,9 @@
  *  ANTARMAN AI — Frontend State Engine
  * ============================================================
  *  - Multi-conversation store persisted in localStorage
- *  - Sidebar history (grouped, searchable, rename/delete)
- *  - Settings (theme / language / text size)
- *  - XSS-safe rendering + vanilla markdown parser
+ *  - Sidebar history (grouped, searchable, rename/delete/pin)
+ *  - Collapsible icon rail · settings · sign-in placeholder
+ *  - XSS-safe rendering + vanilla markdown parser (preserved)
  *  - Talks to the unchanged POST /api/chat backend:
  *      request:  { message, history:[{role,parts:[{text}]}] }
  *      response: { reply } | { error }
@@ -33,6 +33,33 @@ const topbarNew = document.getElementById("topbar-new");
 const collapseBtn = document.getElementById("collapse-btn");
 const menuBtn = document.getElementById("menu-btn");
 
+/* Rail */
+const railExpand = document.getElementById("rail-expand");
+const railNew = document.getElementById("rail-new");
+const railSearch = document.getElementById("rail-search");
+const railSettings = document.getElementById("rail-settings");
+const railProfile = document.getElementById("rail-profile");
+
+/* Composer extras */
+const modelPill = document.getElementById("model-pill");
+const modelMenu = document.getElementById("model-menu");
+const micBtn = document.getElementById("mic-btn");
+const attachBtn = document.getElementById("attach-btn");
+
+/* Footer / auth */
+const signinBtn = document.getElementById("signin-btn");
+const profileRow = document.getElementById("profile-row");
+const profileName = document.getElementById("profile-name");
+const profileMenuBtn = document.getElementById("profile-menu-btn");
+const accountMenu = document.getElementById("account-menu");
+const acctSettings = document.getElementById("acct-settings");
+const acctSignout = document.getElementById("acct-signout");
+
+const signinScrim = document.getElementById("signin-scrim");
+const signinClose = document.getElementById("signin-close");
+const signinDemo = document.getElementById("signin-demo");
+
+/* Settings */
 const settingsBtn = document.getElementById("settings-btn");
 const settingsPanel = document.getElementById("settings-panel");
 const panelScrim = document.getElementById("panel-scrim");
@@ -52,8 +79,13 @@ const STORAGE_KEY = "antarman.v2";
 const GREETINGS = [
   "What should we focus on?",
   "Aaj hum kis par dhyaan dein?",
+  "आज हम किस पर ध्यान दें?",
   "What's on your mind today?",
-  "मैं आपकी किस बात में मदद करूँ?",
+];
+const NAMED_GREETINGS = [
+  (n) => `Your move, ${n}.`,
+  (n) => `Hi, ${n}. What's on your mind?`,
+  (n) => `Namaste ${n} — kis par baat karein?`,
 ];
 const GENERIC_ERROR =
   "Kshama kijiye 🙏 — kuch takneeki samasya aa gayi. Kripya thodi der baad phir prayas kijiye.";
@@ -65,6 +97,7 @@ let store = {
   conversations: [],
   activeId: null,
   settings: { theme: "system", lang: "auto", size: "comfortable", collapsed: false },
+  account: null, // { name } when "signed in"
 };
 let isGenerating = false;
 
@@ -80,12 +113,12 @@ function load() {
         store.conversations = Array.isArray(parsed.conversations) ? parsed.conversations : [];
         store.activeId = parsed.activeId || null;
         store.settings = Object.assign(store.settings, parsed.settings || {});
+        store.account = parsed.account || null;
       }
     }
   } catch (e) {
     /* corrupt storage — start fresh */
   }
-  // Validate activeId points at a real conversation, else draft.
   if (store.activeId && !store.conversations.some((c) => c.id === store.activeId)) {
     store.activeId = null;
   }
@@ -206,17 +239,20 @@ const ICONS = {
   copy: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
   regen: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>',
   dots: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3-1-6Z"/><path d="M12 16v4"/></svg>',
+  unpin: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M9 4h6l-1 6 2.2 2.2M7 13h6M12 16v4"/></svg>',
+  rename: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  pinBadge: '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M9 3h6l-1 6 3 3H7l3-3-1-6Z"/><rect x="11" y="15" width="2" height="6" rx="1"/></svg>',
 };
 
 function avatarNode() {
-  // A compact monogram reads far better in a 30px circle than the wide wordmark.
   const av = document.createElement("div");
   av.className = "msg__avatar";
   av.textContent = "अ";
   av.setAttribute("aria-hidden", "true");
   return av;
 }
-
 function toolButton(label, icon, onClick) {
   const b = document.createElement("button");
   b.type = "button";
@@ -225,24 +261,20 @@ function toolButton(label, icon, onClick) {
   b.addEventListener("click", onClick);
   return b;
 }
-
 function messageNode(role, text, opts) {
   opts = opts || {};
   const wrap = document.createElement("div");
   wrap.className = "msg " + (role === "user" ? "user" : "assistant");
-
   if (role !== "user") wrap.appendChild(avatarNode());
 
   const col = document.createElement("div");
   col.className = "msg__col";
-
   const bubble = document.createElement("div");
   bubble.className = "bubble";
   if (role === "user") {
     bubble.innerHTML = escapeHTML(text).replace(/\n/g, "<br>");
   } else {
-    // Safe: parseMarkdown escapes every line before generating HTML.
-    bubble.innerHTML = parseMarkdown(text);
+    bubble.innerHTML = parseMarkdown(text); // safe: every line escaped before HTML
   }
   if (opts.error) bubble.style.color = "var(--danger)";
   col.appendChild(bubble);
@@ -250,27 +282,16 @@ function messageNode(role, text, opts) {
   if (role !== "user" && !opts.error) {
     const tools = document.createElement("div");
     tools.className = "msg__tools";
-    tools.appendChild(
-      toolButton("Copy", ICONS.copy, function (e) {
-        copyText(text, e.currentTarget);
-      })
-    );
-    tools.appendChild(
-      toolButton("Regenerate", ICONS.regen, function () {
-        regenerateLast();
-      })
-    );
+    tools.appendChild(toolButton("Copy", ICONS.copy, (e) => copyText(text, e.currentTarget)));
+    tools.appendChild(toolButton("Regenerate", ICONS.regen, () => regenerateLast()));
     col.appendChild(tools);
   }
-
   wrap.appendChild(col);
   return wrap;
 }
-
 function appendMessageDOM(role, text, opts) {
   messagesEl.appendChild(messageNode(role, text, opts));
 }
-
 function appendTyping() {
   const wrap = document.createElement("div");
   wrap.className = "msg assistant";
@@ -287,7 +308,6 @@ function appendTyping() {
   messagesEl.appendChild(wrap);
   return wrap;
 }
-
 function copyText(text, btn) {
   const done = () => {
     const span = btn.querySelector("span");
@@ -299,28 +319,29 @@ function copyText(text, btn) {
   };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(done);
-  } else {
-    done();
-  }
+  } else { done(); }
 }
 
 /* ============================================================
    THREAD + EMPTY STATE
    ============================================================ */
+function pickGreeting() {
+  const name = store.account && store.account.name;
+  if (name) {
+    const fn = NAMED_GREETINGS[Math.floor(Math.random() * NAMED_GREETINGS.length)];
+    return fn(name);
+  }
+  return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+}
 function showEmpty() {
-  heroGreeting.textContent = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+  heroGreeting.textContent = pickGreeting();
   app.classList.add("is-empty");
 }
-function hideEmpty() {
-  app.classList.remove("is-empty");
-}
+function hideEmpty() { app.classList.remove("is-empty"); }
 function renderThread() {
   messagesEl.innerHTML = "";
   const conv = getActive();
-  if (!conv || conv.messages.length === 0) {
-    showEmpty();
-    return;
-  }
+  if (!conv || conv.messages.length === 0) { showEmpty(); return; }
   hideEmpty();
   conv.messages.forEach((m) => appendMessageDOM(m.role, m.text, { error: m.error }));
   requestAnimationFrame(scrollToBottom);
@@ -338,8 +359,9 @@ function groupConvs(convs) {
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const startYest = startToday - 86400000;
   const start7 = startToday - 6 * 86400000;
-  const groups = { Today: [], Yesterday: [], "Previous 7 days": [], Older: [] };
+  const groups = { Pinned: [], Today: [], Yesterday: [], "Previous 7 days": [], Older: [] };
   convs.forEach((c) => {
+    if (c.pinned) { groups.Pinned.push(c); return; }
     const t = c.updatedAt || c.createdAt || 0;
     if (t >= startToday) groups.Today.push(c);
     else if (t >= startYest) groups.Yesterday.push(c);
@@ -348,13 +370,20 @@ function groupConvs(convs) {
   });
   return groups;
 }
-
 function historyItem(conv) {
   const item = document.createElement("div");
   item.className = "history__item" + (conv.id === store.activeId ? " active" : "");
   item.dataset.id = conv.id;
   item.setAttribute("role", "button");
   item.tabIndex = 0;
+
+  if (conv.pinned) {
+    const pin = document.createElement("span");
+    pin.className = "history__pin";
+    pin.setAttribute("aria-label", "Pinned");
+    pin.innerHTML = ICONS.pinBadge;
+    item.appendChild(pin);
+  }
 
   const title = document.createElement("span");
   title.className = "history__title";
@@ -366,10 +395,7 @@ function historyItem(conv) {
   menu.className = "history__menu";
   menu.setAttribute("aria-label", "Chat options");
   menu.innerHTML = ICONS.dots;
-  menu.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openCtxMenu(e.currentTarget, conv);
-  });
+  menu.addEventListener("click", (e) => { e.stopPropagation(); openCtxMenu(e.currentTarget, conv); });
   item.appendChild(menu);
 
   const select = () => selectConversation(conv.id);
@@ -379,15 +405,12 @@ function historyItem(conv) {
   });
   return item;
 }
-
 function renderSidebar() {
   const q = (searchInput.value || "").trim().toLowerCase();
   let convs = store.conversations.slice().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
   if (q) {
     convs = convs.filter(
-      (c) =>
-        c.title.toLowerCase().includes(q) ||
-        c.messages.some((m) => m.text.toLowerCase().includes(q))
+      (c) => c.title.toLowerCase().includes(q) || c.messages.some((m) => m.text.toLowerCase().includes(q))
     );
   }
   historyEl.innerHTML = "";
@@ -410,34 +433,38 @@ function renderSidebar() {
   });
 }
 
-/* ---------- Context menu (rename / delete) ---------- */
+/* ---------- Context menu (rename / pin / delete) ---------- */
 let openCtx = null;
-function closeCtxMenu() {
-  if (openCtx) { openCtx.remove(); openCtx = null; }
+function closeCtxMenu() { if (openCtx) { openCtx.remove(); openCtx = null; } }
+function ctxButton(label, icon, cls, onClick) {
+  const b = document.createElement("button");
+  b.type = "button";
+  if (cls) b.className = cls;
+  b.innerHTML = icon + "<span>" + label + "</span>";
+  b.addEventListener("click", onClick);
+  return b;
 }
 function openCtxMenu(anchor, conv) {
   closeCtxMenu();
   const menu = document.createElement("div");
   menu.className = "ctx";
-  const rename = document.createElement("button");
-  rename.type = "button";
-  rename.textContent = "Rename";
-  rename.addEventListener("click", () => { closeCtxMenu(); startRename(conv); });
-  const del = document.createElement("button");
-  del.type = "button";
-  del.className = "danger";
-  del.textContent = "Delete";
-  del.addEventListener("click", async () => {
+  menu.appendChild(ctxButton("Rename", ICONS.rename, "", () => { closeCtxMenu(); startRename(conv); }));
+  menu.appendChild(ctxButton(conv.pinned ? "Unpin" : "Pin", conv.pinned ? ICONS.unpin : ICONS.pin, "", () => {
+    closeCtxMenu();
+    conv.pinned = !conv.pinned;
+    conv.updatedAt = Date.now();
+    save();
+    renderSidebar();
+  }));
+  menu.appendChild(ctxButton("Delete", ICONS.trash, "danger", async () => {
     closeCtxMenu();
     const ok = await confirmDialog('Delete "' + conv.title + '"? This cannot be undone.', "Delete");
     if (ok) deleteConversation(conv.id);
-  });
-  menu.appendChild(rename);
-  menu.appendChild(del);
+  }));
   document.body.appendChild(menu);
 
   const r = anchor.getBoundingClientRect();
-  const mw = 160;
+  const mw = 168;
   menu.style.top = r.bottom + 6 + "px";
   menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - mw - 8)) + "px";
   openCtx = menu;
@@ -447,7 +474,6 @@ document.addEventListener("click", (e) => {
 });
 
 function startRename(conv) {
-  // Make sure the item exists in the current (possibly filtered) sidebar.
   if (searchInput.value) { searchInput.value = ""; }
   renderSidebar();
   const target = historyEl.querySelector('.history__item[data-id="' + conv.id + '"]');
@@ -484,12 +510,8 @@ function ensureActive() {
   let conv = getActive();
   if (!conv) {
     conv = {
-      id: uid(),
-      title: "New chat",
-      titleSet: false,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      messages: [],
+      id: uid(), title: "New chat", titleSet: false, pinned: false,
+      createdAt: Date.now(), updatedAt: Date.now(), messages: [],
     };
     store.conversations.push(conv);
     store.activeId = conv.id;
@@ -532,14 +554,14 @@ function setComposerBusy(busy) {
   if (!busy) input.focus();
 }
 function updateSendState() {
-  sendBtn.disabled = isGenerating || input.value.trim().length === 0;
+  const hasText = input.value.trim().length > 0;
+  composer.classList.toggle("has-text", hasText);
+  sendBtn.disabled = isGenerating || !hasText;
 }
-
 async function callModel(userText, history, conv) {
   const typingEl = appendTyping();
   setComposerBusy(true);
   scrollToBottom();
-
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -548,7 +570,6 @@ async function callModel(userText, history, conv) {
     });
     const data = await res.json().catch(() => ({}));
     typingEl.remove();
-
     const ok = res.ok && typeof data.reply === "string";
     const text = ok ? data.reply : (data && typeof data.error === "string" ? data.error : GENERIC_ERROR);
     conv.messages.push({ role: "model", text, error: !ok });
@@ -567,35 +588,28 @@ async function callModel(userText, history, conv) {
     setComposerBusy(false);
   }
 }
-
 function sendMessage(text) {
   const conv = ensureActive();
-  // History = context BEFORE this new user turn, in the backend's shape.
   const history = conv.messages.map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
-
   conv.messages.push({ role: "user", text });
   if (!conv.titleSet) { conv.title = titleFrom(text); conv.titleSet = true; }
   conv.updatedAt = Date.now();
   save();
   renderSidebar();
   updateTitle();
-
   hideEmpty();
   appendMessageDOM("user", text);
   callModel(text, history, conv);
 }
-
 function regenerateLast() {
   if (isGenerating) return;
   const conv = getActive();
   if (!conv) return;
-  // Find the last user turn.
   let u = conv.messages.length - 1;
   while (u >= 0 && conv.messages[u].role !== "user") u--;
   if (u < 0) return;
   const userText = conv.messages[u].text;
   const history = conv.messages.slice(0, u).map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
-  // Drop everything after that user turn (the old answer).
   conv.messages = conv.messages.slice(0, u + 1);
   conv.updatedAt = Date.now();
   save();
@@ -608,23 +622,17 @@ function regenerateLast() {
    ============================================================ */
 function applySettings() {
   const s = store.settings;
-  // Theme
   if (s.theme === "system") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme", s.theme);
-  // Size
   if (s.size === "compact") document.documentElement.setAttribute("data-size", "compact");
   else document.documentElement.removeAttribute("data-size");
-  // Sidebar collapse (desktop)
   app.classList.toggle("collapsed", !!s.collapsed);
-  // Reflect active states
   markSeg(themeSeg, "themeValue", s.theme);
   markSeg(langSeg, "langValue", s.lang);
   markSeg(sizeSeg, "sizeValue", s.size);
 }
 function markSeg(seg, dataKey, value) {
-  seg.querySelectorAll("button").forEach((b) => {
-    b.classList.toggle("active", b.dataset[dataKey] === value);
-  });
+  seg.querySelectorAll("button").forEach((b) => b.classList.toggle("active", b.dataset[dataKey] === value));
 }
 function openSettings() {
   settingsPanel.classList.add("open");
@@ -636,6 +644,55 @@ function closeSettings() {
   settingsPanel.setAttribute("aria-hidden", "true");
   panelScrim.classList.remove("show");
 }
+
+/* ============================================================
+   AUTH (placeholder) + ACCOUNT MENU
+   ============================================================ */
+function renderAccount() {
+  const acc = store.account;
+  if (acc && acc.name) {
+    signinBtn.hidden = true;
+    profileRow.hidden = false;
+    profileName.textContent = acc.name;
+  } else {
+    signinBtn.hidden = false;
+    profileRow.hidden = true;
+  }
+}
+function openSignin() { signinScrim.classList.add("show"); }
+function closeSignin() { signinScrim.classList.remove("show"); }
+
+/* Generic dropdown menu positioning (model + account) */
+let openDropdown = null;
+function closeDropdown() {
+  if (openDropdown) {
+    openDropdown.el.hidden = true;
+    openDropdown.el.setAttribute("aria-hidden", "true");
+    if (openDropdown.trigger) openDropdown.trigger.setAttribute("aria-expanded", "false");
+    openDropdown = null;
+  }
+}
+function showDropdown(el, trigger, align) {
+  closeDropdown();
+  el.hidden = false;
+  el.setAttribute("aria-hidden", "false");
+  if (trigger) trigger.setAttribute("aria-expanded", "true");
+  const r = trigger.getBoundingClientRect();
+  const w = el.offsetWidth || 260;
+  const h = el.offsetHeight || 120;
+  let left = align === "right" ? r.right - w : r.left;
+  left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+  let top = r.top - h - 8;                        // prefer above
+  if (top < 8) top = r.bottom + 8;                // fall below if no room
+  el.style.left = left + "px";
+  el.style.top = top + "px";
+  openDropdown = { el, trigger };
+}
+document.addEventListener("click", (e) => {
+  if (openDropdown && !openDropdown.el.contains(e.target) && !openDropdown.trigger.contains(e.target)) {
+    closeDropdown();
+  }
+});
 
 /* ============================================================
    CONFIRM DIALOG
@@ -658,9 +715,7 @@ function confirmDialog(message, okLabel) {
 /* ============================================================
    DRAWER / COLLAPSE
    ============================================================ */
-function isMobile() {
-  return window.matchMedia("(max-width: 820px)").matches;
-}
+function isMobile() { return window.matchMedia("(max-width: 840px)").matches; }
 function openDrawer() { app.classList.add("drawer-open"); scrim.classList.add("show"); }
 function closeDrawer() { app.classList.remove("drawer-open"); scrim.classList.remove("show"); }
 function toggleSidebar() {
@@ -671,6 +726,11 @@ function toggleSidebar() {
     app.classList.toggle("collapsed", store.settings.collapsed);
     save();
   }
+}
+function expandSidebar() {
+  store.settings.collapsed = false;
+  app.classList.remove("collapsed");
+  save();
 }
 
 /* ============================================================
@@ -707,6 +767,13 @@ collapseBtn.addEventListener("click", toggleSidebar);
 menuBtn.addEventListener("click", toggleSidebar);
 scrim.addEventListener("click", closeDrawer);
 
+/* Rail */
+railExpand.addEventListener("click", expandSidebar);
+railNew.addEventListener("click", () => { expandSidebar(); newChat(); });
+railSearch.addEventListener("click", () => { expandSidebar(); setTimeout(() => searchInput.focus(), 60); });
+railSettings.addEventListener("click", openSettings);
+railProfile.addEventListener("click", () => { if (store.account) openAccountMenu(railProfile); else openSignin(); });
+
 searchInput.addEventListener("input", renderSidebar);
 
 convTitle.addEventListener("click", () => {
@@ -723,6 +790,54 @@ chipsWrap.querySelectorAll(".chip").forEach((chip) => {
   });
 });
 
+/* Composer placeholder buttons */
+attachBtn.addEventListener("click", () => input.focus());
+micBtn.addEventListener("click", () => input.focus());
+
+/* Model selector */
+modelPill.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (openDropdown && openDropdown.el === modelMenu) { closeDropdown(); return; }
+  showDropdown(modelMenu, modelPill, "left");
+});
+modelMenu.querySelectorAll("[data-model]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    modelMenu.querySelectorAll(".menu__item").forEach((b) => b.classList.remove("is-checked"));
+    btn.classList.add("is-checked");
+    modelPillLabel.textContent = btn.dataset.model;
+    closeDropdown();
+  });
+});
+
+/* Auth */
+signinBtn.addEventListener("click", openSignin);
+signinClose.addEventListener("click", closeSignin);
+signinScrim.addEventListener("click", (e) => { if (e.target === signinScrim) closeSignin(); });
+signinDemo.addEventListener("click", () => {
+  store.account = { name: "Friend" };
+  save();
+  renderAccount();
+  closeSignin();
+  if (app.classList.contains("is-empty")) heroGreeting.textContent = pickGreeting();
+});
+function openAccountMenu(trigger) {
+  showDropdown(accountMenu, trigger, "left");
+}
+profileMenuBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (openDropdown && openDropdown.el === accountMenu) { closeDropdown(); return; }
+  openAccountMenu(profileMenuBtn);
+});
+acctSettings.addEventListener("click", () => { closeDropdown(); openSettings(); });
+acctSignout.addEventListener("click", () => {
+  closeDropdown();
+  store.account = null;
+  save();
+  renderAccount();
+  if (app.classList.contains("is-empty")) heroGreeting.textContent = pickGreeting();
+});
+
+/* Settings */
 settingsBtn.addEventListener("click", openSettings);
 panelClose.addEventListener("click", closeSettings);
 panelScrim.addEventListener("click", closeSettings);
@@ -731,22 +846,19 @@ themeSeg.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-theme-value]");
   if (!b) return;
   store.settings.theme = b.dataset.themeValue;
-  save();
-  applySettings();
+  save(); applySettings();
 });
 langSeg.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-lang-value]");
   if (!b) return;
   store.settings.lang = b.dataset.langValue;
-  save();
-  applySettings();
+  save(); applySettings();
 });
 sizeSeg.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-size-value]");
   if (!b) return;
   store.settings.size = b.dataset.sizeValue;
-  save();
-  applySettings();
+  save(); applySettings();
 });
 clearAllBtn.addEventListener("click", async () => {
   const ok = await confirmDialog("Clear all conversations? This cannot be undone.", "Clear all");
@@ -763,10 +875,13 @@ clearAllBtn.addEventListener("click", async () => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeCtxMenu();
+    closeDropdown();
+    if (signinScrim.classList.contains("show")) closeSignin();
     if (settingsPanel.classList.contains("open")) closeSettings();
     if (app.classList.contains("drawer-open")) closeDrawer();
   }
 });
+window.addEventListener("resize", () => { closeDropdown(); closeCtxMenu(); });
 
 /* ============================================================
    MODEL PILL (from /api/health) — informational only
@@ -778,7 +893,6 @@ function prettyModel(name) {
   if (n.includes("llama-3.1-8b")) return "Llama 3.1 8B";
   if (n.includes("qwen3-32b")) return "Qwen3 32B";
   if (n.includes("gemini")) return "Gemini";
-  // Fall back to a tidy version of the raw id.
   return name.split("/").pop();
 }
 async function loadModelPill() {
@@ -787,12 +901,11 @@ async function loadModelPill() {
     if (!res.ok) return;
     const data = await res.json();
     if (data && data.model) {
-      modelPillLabel.textContent = prettyModel(data.model);
-      modelPillLabel.parentElement.title = "Model: " + data.model + " · Provider: " + (data.provider || "");
+      const pretty = prettyModel(data.model);
+      modelPillLabel.textContent = pretty;
+      modelPill.title = "Model: " + data.model + " · Provider: " + (data.provider || "");
     }
-  } catch (e) {
-    /* keep the default "AntarMan" label */
-  }
+  } catch (e) { /* keep default "AntarMan" */ }
 }
 
 /* ============================================================
@@ -801,6 +914,7 @@ async function loadModelPill() {
 function init() {
   load();
   applySettings();
+  renderAccount();
   renderSidebar();
   renderThread();
   updateTitle();

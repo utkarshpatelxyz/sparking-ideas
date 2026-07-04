@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="ANTARMAN AI — Your inner voice. An empathetic, multilingual AI companion for India." />
-  <meta name="theme-color" content="#0e0e0d" />
+  <meta name="theme-color" content="#131314" />
   <title>ANTARMAN AI — Your inner voice</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,19 +17,35 @@
 </head>
 
 <body>
-  <div class="ambient" aria-hidden="true"></div>
-
   <div class="app is-empty" id="app">
-    <!-- ============================ SIDEBAR ============================ -->
+    <!-- ============================ COLLAPSED ICON RAIL (desktop) ============================ -->
+    <aside class="rail" id="rail" aria-label="Sidebar (collapsed)">
+      <button class="rail__mark" id="rail-expand" type="button" aria-label="Expand sidebar" title="Expand sidebar">
+        <span class="mark" aria-hidden="true">अ</span>
+      </button>
+      <div class="rail__group">
+        <button class="rail__btn" id="rail-new" type="button" aria-label="New chat" title="New chat">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <button class="rail__btn" id="rail-search" type="button" aria-label="Search chats" title="Search chats">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+      </div>
+      <div class="rail__spacer"></div>
+      <button class="rail__btn" id="rail-settings" type="button" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="rail__avatar" id="rail-profile" type="button" aria-label="Account" title="Account">
+        <span class="mark mark--sm" aria-hidden="true">अ</span>
+      </button>
+    </aside>
+
+    <!-- ============================ FULL SIDEBAR ============================ -->
     <aside class="sidebar" id="sidebar" aria-label="Conversations">
       <div class="sidebar__head">
         <a class="brand" href="#" id="brand-home" aria-label="ANTARMAN AI home">
-          <img
-            src="antarman-logo.svg"
-            alt="ANTARMAN"
-            class="brand__img"
-            onerror="if(!this.dataset.p){this.dataset.p='1';this.src='antarman-logo.png';}else{this.style.display='none';this.nextElementSibling.style.display='inline-flex';}"
-          />
+          <img src="antarman-logo.png" alt="ANTARMAN" class="brand__img"
+            onerror="if(!this.dataset.p){this.dataset.p='1';this.src='antarman-logo.svg';}else{this.style.display='none';this.nextElementSibling.style.display='inline';}" />
           <span class="brand__wordmark" style="display:none;">ANTARMAN</span>
           <span class="brand__ai">AI</span>
         </a>
@@ -55,15 +71,35 @@
       </div>
 
       <div class="sidebar__foot">
-        <div class="profile">
+        <!-- Logged-out -->
+        <button class="signin" id="signin-btn" type="button">
+          <span class="avatar avatar--ghost" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+          </span>
+          <span class="signin__meta">
+            <span class="signin__name">Sign in</span>
+            <span class="signin__sub">Save chats across devices</span>
+          </span>
+        </button>
+
+        <!-- Logged-in (hidden until signed in) -->
+        <div class="profile" id="profile-row" hidden>
           <span class="avatar" aria-hidden="true">अ</span>
           <div class="profile__meta">
-            <span class="profile__name">You</span>
+            <span class="profile__name" id="profile-name">You</span>
             <span class="profile__sub">AntarMan companion</span>
           </div>
-          <button class="icon-btn" id="settings-btn" type="button" aria-label="Settings" title="Settings">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <button class="icon-btn" id="profile-menu-btn" type="button" aria-label="Account menu" title="Account menu">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
           </button>
+        </div>
+
+        <div class="foot-bar">
+          <button class="foot-link" id="settings-btn" type="button">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </button>
+          <span class="made-in" title="Built in India">Built in India <span aria-hidden="true">🇮🇳</span></span>
         </div>
       </div>
     </aside>
@@ -72,6 +108,8 @@
 
     <!-- ============================ MAIN ============================ -->
     <main class="main">
+      <div class="ambient" aria-hidden="true"></div>
+
       <header class="topbar">
         <button class="icon-btn topbar__menu" id="menu-btn" type="button" aria-label="Open sidebar">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -95,23 +133,32 @@
         <!-- Composer (centered when empty, docked bottom when chatting) -->
         <div class="composer-dock">
           <form class="composer" id="composer" autocomplete="off">
-            <textarea
-              id="input"
-              class="composer__input"
-              rows="1"
-              maxlength="8000"
-              placeholder="Ask AntarMan…  /  अपने मन की बात लिखिए…"
-              aria-label="Message AntarMan"
-            ></textarea>
-            <div class="composer__bar">
-              <span class="model-pill" id="model-pill" title="Active model">
-                <span class="model-pill__dot" aria-hidden="true"></span>
-                <span id="model-pill-label">AntarMan</span>
-              </span>
-              <div class="composer__grow"></div>
-              <button class="send" id="send-btn" type="submit" aria-label="Send message" disabled>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+            <div class="composer__glow" aria-hidden="true"></div>
+            <div class="composer__row">
+              <button class="composer__attach" id="attach-btn" type="button" aria-label="Add files" title="Add files (coming soon)">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
               </button>
+              <textarea
+                id="input"
+                class="composer__input"
+                rows="1"
+                maxlength="8000"
+                placeholder="Ask AntarMan…  /  अपने मन की बात लिखिए…"
+                aria-label="Message AntarMan"
+              ></textarea>
+              <div class="composer__actions">
+                <button class="model-pill" id="model-pill" type="button" title="Choose model" aria-haspopup="menu" aria-expanded="false">
+                  <span id="model-pill-label">AntarMan</span>
+                  <span class="model-pill__ext">Extended</span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <button class="mic" id="mic-btn" type="button" aria-label="Voice input" title="Voice input (coming soon)">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>
+                </button>
+                <button class="send" id="send-btn" type="submit" aria-label="Send message" disabled>
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+                </button>
+              </div>
             </div>
           </form>
 
@@ -122,10 +169,32 @@
             <button class="chip" type="button">Draft a polite leave email</button>
           </div>
 
-          <p class="disclaimer">AntarMan can make mistakes — for important decisions, please consult a professional.</p>
+          <p class="disclaimer">AntarMan is AI and can make mistakes.</p>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- ============================ MODEL MENU ============================ -->
+  <div class="menu" id="model-menu" role="menu" aria-hidden="true" hidden>
+    <button type="button" role="menuitemradio" data-model="AntarMan" class="menu__item is-checked">
+      <span class="menu__title">AntarMan <span class="menu__tag">Extended</span></span>
+      <span class="menu__desc">Warm, empathetic — best for everyday conversations</span>
+    </button>
+    <button type="button" role="menuitemradio" data-model="Llama 3.3 70B" class="menu__item">
+      <span class="menu__title">Llama 3.3 70B</span>
+      <span class="menu__desc">Larger model for complex reasoning</span>
+    </button>
+  </div>
+
+  <!-- ============================ ACCOUNT MENU ============================ -->
+  <div class="menu" id="account-menu" role="menu" aria-hidden="true" hidden>
+    <button type="button" role="menuitem" class="menu__item menu__item--row" id="acct-settings">
+      <span class="menu__title">Settings</span>
+    </button>
+    <button type="button" role="menuitem" class="menu__item menu__item--row danger" id="acct-signout">
+      <span class="menu__title">Sign out</span>
+    </button>
   </div>
 
   <!-- ============================ SETTINGS ============================ -->
@@ -168,10 +237,25 @@
       </div>
       <div class="about">
         <p><strong>ANTARMAN AI</strong> — अंतर्मन, your inner voice. An empathetic companion that speaks English, Hindi and Hinglish.</p>
-        <p class="about__safe">If you are in distress, please reach a professional. India — KIRAN helpline <strong>1800-599-0019</strong> · Emergency <strong>112</strong>.</p>
+        <p class="about__safe">If you are in distress, please reach out. India — KIRAN mental-health helpline <strong>1800-599-0019</strong> (24×7).</p>
+        <p class="about__made">Built in India <span aria-hidden="true">🇮🇳</span></p>
       </div>
     </div>
   </aside>
+
+  <!-- ============================ SIGN-IN MODAL ============================ -->
+  <div class="modal-scrim" id="signin-scrim" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signin-title">
+      <button class="modal__x" id="signin-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <span class="modal__mark" aria-hidden="true">अ</span>
+      <h2 id="signin-title">Sign in to AntarMan</h2>
+      <p class="modal__sub">Accounts are on the way. For now, your chats are saved privately on this device.</p>
+      <button class="modal__primary" id="signin-demo" type="button">Continue as guest</button>
+      <p class="modal__soon">Google &amp; email sign-in — coming soon</p>
+    </div>
+  </div>
 
   <!-- ============================ CONFIRM ============================ -->
   <div class="confirm-scrim" id="confirm-scrim" aria-hidden="true">
